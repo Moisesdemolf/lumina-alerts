@@ -1,5 +1,5 @@
 // Bienvenido a mi humilde libreria.
-// con licencia mint
+// con licencia apache 2.0
 // este es el codigo fuente:
 const boom = (options) => showAlert(options);
 
