@@ -1,0 +1,487 @@
+/* el alerta madre*/
+  .custom-alert {
+    position: fixed;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    width: 84%;
+    max-width: 600px; 
+    transition: opacity 0.3s ease-in-out;
+    transform-style: preserve-3d;
+    z-index: 99;
+  }
+
+  #botones-ios {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0px;
+  }
+  
+  #botones-android {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /*estilo para el input (se agregara en la proxima actualizacion) */
+
+  .custom-alert #myinput-none ,#myinput-warning, #myinput-info, #myinput-success, #myinput-error, #myinput-ios{
+    padding: 10px;
+    width: 90%;
+    font-size: 14px;
+    line-height: 20px;
+    color: #24292e;
+    vertical-align: middle;
+    background-color: #ffffff;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    outline: none;
+    margin-bottom: 10px;
+    box-shadow: rgba(225, 228, 232, 0.2) 0px 1px 0px 0px inset;
+  }
+    .custom-alert #myiput-none:focus, #myiput-warning:focus, #myiput-info:focus, #myiput-error:focus, #myiput-success:focus, #myiput-ios:focus{
+        border-color: #0366d6;
+        outline: none;
+        box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
+    }
+
+    .custom-alert #myinput-android {
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 14px;
+        vertical-align: baseline;
+        font-weight: 400;
+        line-height: 1.29;
+        letter-spacing: .16px;
+        border-radius: 0;
+        outline: 2px solid transparent;
+        outline-offset: -2px;
+        width: 100%;
+        height: 40px;
+        border: none;
+        border-bottom: 1px solid #8d8d8d;
+        background-color: #f4f4f4;
+        padding: 0 16px;
+        color: #161616;
+        transition: background-color 70ms cubic-bezier(.2,0,.38,.9),outline 70ms cubic-bezier(.2,0,.38,.9);
+    }
+    
+    
+
+/*estilo para la imagen */
+
+  .custom-alert img{
+    /*display: block;
+    position: fixed;*/
+    max-width:100px;
+    max-height: 99px;
+    /*top: -60px;
+    left: 37%;*/
+  }
+
+  /*estilo al centro */
+
+  .custom-alert.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /*estilo arriba izquierda */
+
+  .custom-alert.top-left {
+    top: 9px;
+    left: 1%;
+    transform: translateX(-1%);
+  }
+
+  /*estilo arriba derecha */
+
+  .custom-alert.top-right {
+    top: 9px;
+    left: 99%;
+    transform: translateX(-99%);
+  }
+
+  /*estilo abajo izquierda */
+
+  .custom-alert.bottom-left {
+    bottom: 9px;
+    left: 1%;
+    transform: translateX(-1%);
+  }
+
+  /*estilo abajo derecha */
+
+  .custom-alert.bottom-right {
+    bottom: 9px;
+    left: 99%;
+    transform: translateX(-99%);
+  }
+
+  /*estilo abajo en el centro */
+
+  .custom-alert.bottom-center {
+    bottom: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /*estilo arriba en el centro */
+
+  .custom-alert.top-center {
+    top: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /*estilo success */
+
+  .custom-alert.success {
+    background-color: #13d162;
+    color: #fff;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+  }
+
+  /*estilo de error */
+
+  .custom-alert.error {
+    background-color: rgb(255, 65, 65);
+    color: #fff;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+  }
+/*estilo warning*/
+  .custom-alert.warning {
+    background-color: #ff8c00;
+    color: #fff;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+  }
+
+  /*estilo de info */
+
+  .custom-alert.info {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+  }
+
+  /*estilo de none */
+
+  .custom-alert.none {
+    background-color: #e8e8e8;
+    color: #333;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+  }
+
+  /*estilo ios */
+
+  .custom-alert.ios {
+    background-color: #fff;
+    color: #333;
+    border:1px solid #e7dbdb;
+    border-radius: 17px;
+    border: 2px solid #ddd;
+  }
+
+  /*estilo de android */
+
+  .custom-alert.android {
+    background-color: #fff;
+    color: #333;
+    border-radius: 0;
+  }
+
+  /*estilos del boton de cerrar */
+
+  .custom-alert .close-btn-none, .close-btn-warning {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+    will-change: box-shadow,transform;
+    background: #FCFCFD;
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+    height: 48px;
+    padding: 0 32px;
+    font-size: 18px;
+    border-radius: 6px;
+    color: #36395a;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .close-btn-none:hover, .close-btn-warning:hover{
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+        transform: translateY(-2px);
+    }
+    .custom-alert .close-btn-none:active, .close-btn-warning:active{
+        box-shadow: inset 0px 3px 7px #d6d6e7;
+        transform: translateY(2px);
+    }
+    
+
+  .custom-alert .close-btn-info {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+    will-change: box-shadow,transform;
+    background: #FCFCFD;
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+    height: 48px;
+    padding: 0 32px;
+    font-size: 18px;
+    border-radius: 6px;
+    color: #36395a;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .close-btn-info:hover {
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+        transform: translateY(-2px);
+    }
+    .custom-alert .close-btn-info:active{
+        box-shadow: inset 0px 3px 7px #d6d6e7;
+        transform: translateY(2px);
+    }
+
+  .custom-alert .close-btn-success {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+    will-change: box-shadow,transform;
+    background: #FCFCFD;
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+    height: 48px;
+    padding: 0 32px;
+    font-size: 18px;
+    border-radius: 6px;
+    color: #36395a;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .close-btn-success:hover {
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+        transform: translateY(-2px);
+    }
+    .custom-alert .close-btn-success:active{
+        box-shadow: inset 0px 3px 7px #d6d6e7;
+        transform: translateY(2px);
+    }
+
+  .custom-alert .close-btn-error {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+    will-change: box-shadow,transform;
+    background: #FCFCFD;
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+    height: 48px;
+    padding: 0 32px;
+    font-size: 18px;
+    border-radius: 6px;
+    color: #36395a;
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .close-btn-error:hover {
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #d6d6e7;
+        transform: translateY(-2px);
+    }
+    .custom-alert .close-btn-error:active{
+        box-shadow: inset 0px 3px 7px #d6d6e7;
+        transform: translateY(2px);
+    }
+
+  .custom-alert .close-btn-ios {
+    cursor: pointer;
+    bottom: 0;
+    width: 50%;
+    height: 50px;
+    border: none;
+    color: blue;
+    background-color: transparent;
+    border-top: 2px solid #c8c7cc;
+  }
+
+  .custom-alert .close-btn-ios:hover {
+    background-color: #ebebeb;
+  }
+
+  .custom-alert .close-btn-android {
+    cursor: pointer;
+    float: right;
+    width: 63px;
+    height: 42px;
+    border: none;
+    background-color: transparent;
+    color: #FF8C00;
+    font-size: 20px;
+    font-family: 'Roboto', 'sans-serif';
+    border-radius: 0px 0px 4px 4px;
+  }
+
+  .custom-alert .close-btn-android:hover {
+    background-color: #ccc;
+  }
+
+
+
+  /*estilos del boton de confir
+  otro btn
+  */
+
+  .custom-alert .confir-btn-none , .confir-btn-warning{
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    will-change: box-shadow,transform;
+    background: radial-gradient( 100% 100% at 100% 0%, #89E5FF 0%, #5468FF 100% );
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px rgb(58 65 111 / 50%);
+    padding: 0 32px;
+    border-radius: 6px;
+    color: #fff;
+    height: 48px;
+    font-size: 18px;
+    text-shadow: 0 1px 0 rgb(0 0 0 / 40%);
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .confir-btn-none:hover, .confir-btn-warning:hover{
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #3c4fe0;
+        transform: translateY(-2px);
+    }
+    .custom-alert .confir-btn-none:active, .confir-btn-warning:active{
+        box-shadow: inset 0px 3px 7px #3c4fe0;
+        transform: translateY(2px);
+    }
+    
+
+  .custom-alert .confir-btn-info {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    will-change: box-shadow,transform;
+    background: radial-gradient( 100% 100% at 100% 0%, #00ff00 0%, #1ce01ce3 100% );
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px rgb(58 65 111 / 50%);
+    padding: 0 32px;
+    border-radius: 6px;
+    color: #fff;
+    height: 48px;
+    font-size: 18px;
+    text-shadow: 0 1px 0 rgb(0 0 0 / 40%);
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .confir-btn-info:hover {
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #3c4fe0;
+        transform: translateY(-2px);
+    }
+    .custom-alert .confir-btn-info:active{
+        box-shadow: inset 0px 3px 7px #3c4fe0;
+        transform: translateY(2px);
+    }
+
+  .custom-alert .confir-btn-success {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    will-change: box-shadow,transform;
+    background: radial-gradient( 100% 100% at 100% 0%, #89E5FF 0%, #5468FF 100% );
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px rgb(58 65 111 / 50%);
+    padding: 0 32px;
+    border-radius: 6px;
+    color: #fff;
+    height: 48px;
+    font-size: 18px;
+    text-shadow: 0 1px 0 rgb(0 0 0 / 40%);
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .confir-btn-success:hover {
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #3c4fe0;
+        transform: translateY(-2px);
+    }
+    .custom-alert .confir-btn-success:active{
+        box-shadow: inset 0px 3px 7px #3c4fe0;
+        transform: translateY(2px);
+    }
+
+  .custom-alert .confir-btn-error {
+    display: inline-block;
+    outline: 0;
+    border: 0;
+    cursor: pointer;
+    will-change: box-shadow,transform;
+    background: radial-gradient( 100% 100% at 100% 0%, #89E5FF 0%, #5468FF 100% );
+    box-shadow: 0px 2px 4px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px rgb(58 65 111 / 50%);
+    padding: 0 32px;
+    border-radius: 6px;
+    color: #fff;
+    height: 48px;
+    font-size: 18px;
+    text-shadow: 0 1px 0 rgb(0 0 0 / 40%);
+    transition: box-shadow 0.15s ease,transform 0.15s ease;
+  }
+  .custom-alert .confir-btn-error:hover {
+        box-shadow: 0px 4px 8px rgb(45 35 66 / 40%), 0px 7px 13px -3px rgb(45 35 66 / 30%), inset 0px -3px 0px #3c4fe0;
+        transform: translateY(-2px);
+    }
+    .custom-alert .confir-btn-error:active{
+        box-shadow: inset 0px 3px 7px #3c4fe0;
+        transform: translateY(2px);
+    }
+
+  .custom-alert .confir-btn-ios {
+    float:center;
+    cursor: pointer;
+    bottom: 0;
+    width: 50%;
+    height: 50px;
+    border: none;
+    color: blue;
+    background-color: white;
+    border-top: 2px solid #c8c7cc;
+    border-left: 2px solid #c8c7cc;
+  }
+
+  .custom-alert .confir-btn-ios:hover {
+    background-color: #ebebeb;
+  }
+
+  .custom-alert .confir-btn-android {
+    cursor: pointer;
+    float: right;
+    width: 63px;
+    height: 42px;
+    border: none;
+    background-color: transparent;
+    color: #2196F3;
+    font-size: 20px;
+    font-family: 'Roboto', 'sans-serif';
+    border-radius: 0px 0px 4px 4px;
+  }
+
+  .custom-alert .confir-btn-android:hover {
+    background-color: #ccc;
+  }
+
+  .fadeIn {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+
+  .fadeOut {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotateX(10deg) rotateY(10deg) scale(0.9);
+  }
