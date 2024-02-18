@@ -1,7 +1,7 @@
 // Bienvenido a mi humilde libreria.
 // con licencia apache 2.0
 // este es el codigo fuente:
-const boom = (options) => showAlert(options);
+const msg = (options) => showAlert(options);
 
 // todas las opciones disponibles en mi libreria
 function showAlert(options) {
