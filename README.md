@@ -1,5 +1,5 @@
 ## instalación
-Para comenzar a utilizar boom.js en tu proyecto, simplemente incluye el archivo JavaScript en tu página HTML:
+Para comenzar a utilizar lumina alerts en tu proyecto, simplemente incluye el archivo JavaScript en tu página HTML:
 
 **<script src="boom.js"></script>**
 
@@ -7,7 +7,7 @@ Para comenzar a utilizar boom.js en tu proyecto, simplemente incluye el archivo 
 ## Opciones
 Para mostrar un mensaje emergente utilizando Mi Librería, puedes utilizar la siguiente función:
 
-*boom(options);*
+*msg(options);*
 Donde options es un objeto con las siguientes propiedades:
 
 | Propiedad        | Descripción                                                   |
@@ -30,4 +30,4 @@ Donde options es un objeto con las siguientes propiedades:
 | animationIn      | Animación de entrada para la notificación (fadeIn).             |
 | animationOut     | Animación de salida para la notificación (fadeOut).             |
 
-Para mas opciones de usos o ejemplos mira la documentación ofial de boom.js
+Para mas opciones de usos o ejemplos mira la documentación ofial de lumina alerts en su sitio web
