@@ -1,7 +1,7 @@
 ## instalación
 Para comenzar a utilizar lumina alerts en tu proyecto, simplemente incluye el archivo JavaScript en tu página HTML:
 
-**<script src="https://cdn.jsdelivr.net/gh/Moisesdemolf/lumina-alerts/lumina-alerts.js"></script>**
+**<script src="https://cdn.jsdelivr.net/gh/Moisesdemolf/lumina-alerts/lumina-alerts.js "></script>**
 
 ¡Y eso es todo! Ahora estás listo para mostrar alertas impresionantes en tu sitio web.
 ## Opciones
