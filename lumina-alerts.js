@@ -1,5 +1,5 @@
 // Bienvenido a mi humilde libreria.
-// con licencia apache 2.0
+// con licencia MIT
 // este es el codigo fuente:
 const msg = (options) => showAlert(options);
 
@@ -84,7 +84,7 @@ function closeAlert(alertElement, animationOut) {
 function aplicarEstilos (){
   var estilos= document.createElement('link');
   estilos.setAttribute('rel', 'stylesheet');
-  estilos.setAttribute('href', 'C:/Users/moises/Documents/Proyecto.web/librerias/alert/estilos-alert.css');
+  estilos.setAttribute('href', 'https://cdn.jsdelivr.net/gh/Moisesdemolf/lumina-alerts/estilos-alert.css');
   document.head.appendChild(estilos);
 }
 // Ejemplos de uso:
