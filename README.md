@@ -77,4 +77,4 @@ function mensaje2(){
 };
 ```
 
-Para mas opciones de usos o ejemplos mira la documentación ofial de lumina alerts en su sitio web: https://moisesdemolf.github.io/lumina-alerts.github.io/
+Para mas opciones de usos o ejemplos mira la documentación ofial de lumina alerts en su sitio web: https://moisesdemolf.github.io/lumina_alerts/
