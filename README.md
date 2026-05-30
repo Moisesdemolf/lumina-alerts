@@ -1,397 +1,420 @@
-# 🌟 Lumina Alerts v4.0 - Professional Edition
+# 🌟 Lumina Alerts v4.0
 
-La librería de alertas JavaScript definitiva: **Segura, Rápida, Accesible y Moderna**. Diseñada para superar a SweetAlert2, AlertifyJS y otras bibliotecas tradicionales.
+La librería de alertas JavaScript más moderna, segura y personalizable del mercado. Supera a SweetAlert2 y AlertifyJS en funcionalidades, rendimiento y facilidad de uso.
 
 ## ✨ Características Principales
 
-### 🔒 Seguridad
-- ✅ **Anti-XSS por defecto**: Todo el contenido se escapa automáticamente
-- ✅ **HTML opcional**: Solo se permite HTML cuando se activa `allowHTML: true`
-- ✅ **Validación de inputs**: Sistema de validación en tiempo real
+- **🔒 Seguridad XSS**: Todo el texto se escapa automáticamente
+- **♿ Accesibilidad WCAG 2.1**: Focus trap, navegación por teclado
+- **📱 100% Responsive**: Funciona en todos los dispositivos
+- **🎨 12 Temas Profesionales**: Botones adaptados automáticamente a cada tema
+- **🧙 Wizards Reales**: Multi-paso con navegación y HTML personalizado
+- **🍞 Toast Notifications**: Notificaciones elegantes en 4 posiciones
+- **🔐 Modo Bloqueante**: Previene cierre hasta tomar acción
+- **⚡ Sin Dependencias**: Cero dependencias externas (~20KB)
+- **🎭 5 Animaciones**: zoom, slide-up, fade, bounce, shake
 
-### ♿ Accesibilidad (WCAG 2.1)
-- ✅ **Focus Trap**: El foco permanece dentro del modal
-- ✅ **Navegación por teclado**: Soporte completo para Tab y Escape
-- ✅ **Screen readers**: Estructura semántica correcta
-- ✅ **Gestión de foco**: El foco se restaura al cerrar
+## 📦 Instalación
 
-### 📱 Responsive & UX
-- ✅ **100% Responsive**: Se adapta a todos los dispositivos
-- ✅ **Touch-friendly**: Optimizado para móviles y tablets
-- ✅ **Animaciones suaves**: Transiciones CSS optimizadas
-- ✅ **Scroll lock**: Previene scroll del body cuando está abierto
+### CDN
+```html
+<script src="https://cdn.jsdelivr.net/npm/lumina-alerts@4.0.0/lumina-alerts.min.js"></script>
+```
 
-### ⚡ Rendimiento
-- ✅ **Sin dependencias**: Cero dependencias externas
-- ✅ **Ligero**: ~18KB minificado
-- ✅ **CSS-in-JS**: Estilos inyectados dinámicamente
-- ✅ **Sistema de colas**: Gestión inteligente de múltiples alertas
-
-## 🚀 Instalación
+### NPM
+```bash
+npm install lumina-alerts
+```
 
 ### Local
-Descarga el archivo `lumina-alerts.js` e inclúyelo en tu proyecto:
+Descarga `lumina-alerts.js` e inclúyelo en tu HTML:
 ```html
 <script src="lumina-alerts.js"></script>
 ```
 
-## 📖 Uso Básico
+## 🚀 Uso Básico
 
 ### Alertas Simples
 ```javascript
-// Éxito
-lumina.success('¡Operación completada!', 'Éxito');
+// Success
+lumina.success('¡Operación exitosa!');
 
 // Error
-lumina.error('Ha ocurrido un error', 'Error Crítico');
+lumina.error('Error al conectar');
 
-// Advertencia
-lumina.warning('Cuidado con esta acción', 'Advertencia');
+// Warning
+lumina.warning('Advertencia importante');
 
-// Información
-lumina.info('Nueva actualización disponible', 'Info');
+// Info
+lumina.info('Nueva actualización disponible');
 
-// Pregunta
-lumina.question('¿Estás seguro?', 'Confirmar');
+// Question
+lumina.question('¿Tienes dudas?');
 ```
 
-### Confirmaciones con Promesas
+### Con Opciones Avanzadas
 ```javascript
-lumina.confirm('¿Deseas eliminar este elemento?', 'Eliminar')
-    .then((result) => {
-        if (result) {
-            lumina.success('Elemento eliminado', 'Completado');
-        }
-    })
-    .catch((err) => {
-        lumina.info('Operación cancelada', 'Cancelado');
-    });
-```
-
-### Inputs con Validación
-```javascript
-lumina.prompt('Ingresa tu email:', 'Registro', {
-    inputType: 'email',
-    placeholder: 'tu@email.com',
-    inputValidator: (value) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) return 'Email inválido';
-        return true;
-    }
-})
-.then((email) => {
-    lumina.success(`Registrado: ${email}`, 'Completado');
-})
-.catch(() => {
-    lumina.info('Registro cancelado', 'Cancelado');
+lumina.success({
+  title: '¡Excelente!',
+  text: 'Tu código se ejecutó correctamente',
+  theme: 'success',
+  animation: 'bounce',
+  confirmButtonText: 'Genial'
 });
 ```
 
 ## 🎨 Temas Disponibles
 
+Los botones se adaptan automáticamente al color de cada tema:
+
+| Tema | Descripción |
+|------|-------------|
+| `success` | Verde esmeralda |
+| `error` | Rojo intenso |
+| `warning` | Ámbar brillante |
+| `info` | Azul cielo |
+| `question` | Índigo suave |
+| `dark` | Gris oscuro profesional |
+| `glass` | Efecto vidrio translúcido |
+| `neon` | Cyberpunk con brillo |
+| `minimal` | Blanco y negro limpio |
+| `modern` | Azul corporativo |
+| `gradient` | Degradado púrpura |
+| `sunset` | Degradado naranja |
+| `ocean` | Degradado azul marino |
+
+### Ejemplo de Tema
 ```javascript
-// Temas estándar
-lumina.success('Mensaje', 'Título', { theme: 'success' });
-lumina.error('Mensaje', 'Título', { theme: 'error' });
-lumina.warning('Mensaje', 'Título', { theme: 'warning' });
-lumina.info('Mensaje', 'Título', { theme: 'info' });
-lumina.question('Mensaje', 'Título', { theme: 'question' });
-
-// Temas de estilo
-lumina.alert('Mensaje', 'Dark', { theme: 'dark' });
-lumina.alert('Mensaje', 'Glass', { theme: 'glass' });
-lumina.alert('Mensaje', 'Neon', { theme: 'neon' });
-lumina.alert('Mensaje', 'Minimal', { theme: 'minimal' });
-lumina.alert('Mensaje', 'Sunset', { theme: 'sunset' });
-lumina.alert('Mensaje', 'Ocean', { theme: 'ocean' });
-lumina.alert('Mensaje', 'Modern', { theme: 'modern' });
-```
-
-## 🔒 Modo Bloqueante
-
-Las alertas bloqueantes no se pueden cerrar haciendo click fuera, presionando Escape o hasta que el usuario tome una acción:
-
-```javascript
-lumina.question('Debes aceptar los términos', 'Requerido', {
-    blocking: true,          // No se puede cerrar sin acción
-    closable: false,         // Sin botón X
-    closeOnEsc: false,       // Escape no funciona
-    closeOnOverlay: false,   // Click fuera no funciona
-    confirmButtonText: 'Aceptar',
-    showCancel: true,
-    cancelButtonText: 'Salir'
-})
-.then(() => {
-    // Usuario aceptó
-})
-.catch(() => {
-    // Usuario canceló (si showCancel: true)
+lumina.alert({
+  title: 'Tema Neon',
+  text: 'Este tema tiene colores cyberpunk',
+  theme: 'neon'
 });
 ```
 
-### Forzar Cierre
-```javascript
-const alert = lumina.loading('Procesando...', { blocking: true });
+## 🔔 Tipos de Alertas
 
-// Cerrar desde código externo
-setTimeout(() => {
-    alert.forceClose();
-}, 3000);
+### Confirmación
+```javascript
+lumina.confirm({
+  title: '¿Estás seguro?',
+  text: 'Esta acción no se puede deshacer',
+  confirmButtonText: 'Sí, eliminar',
+  cancelButtonText: 'Cancelar'
+}).then(() => {
+  lumina.success('Eliminado correctamente');
+}).catch(() => {
+  lumina.info('Operación cancelada');
+});
 ```
 
-## 🧙 Wizards (Asistentes Multi-paso)
+### Input/Prompt
+```javascript
+lumina.prompt({
+  title: 'Ingresa tu email',
+  inputPlaceholder: 'ejemplo@correo.com',
+  inputValidator: (value) => {
+    if (!value.includes('@')) return 'Email inválido';
+  }
+}).then((email) => {
+  lumina.success(`Email registrado: ${email}`);
+});
+```
 
+### Loading
+```javascript
+const load = lumina.loading({
+  title: 'Procesando...',
+  text: 'Por favor espera'
+});
+
+setTimeout(() => {
+  load.close(true);
+  lumina.success('¡Completado!');
+}, 2000);
+```
+
+## 🧙 Wizards Reales (Multi-paso)
+
+Los wizards son mini-webs dentro de un modal con navegación entre pasos:
+
+### Wizard Básico
 ```javascript
 lumina.wizard([
-    {
-        title: 'Paso 1: Información',
-        text: 'Completa tus datos básicos',
-        icon: 'info'
-    },
-    {
-        title: 'Paso 2: Preferencias',
-        text: 'Configura tus opciones',
-        icon: 'question'
-    },
-    {
-        title: 'Paso 3: Confirmación',
-        text: 'Revisa y confirma',
-        icon: 'success'
-    }
-])
-.then((result) => {
-    lumina.success('¡Wizard completado!', 'Finalizado');
-})
-.catch((err) => {
-    lumina.info('Wizard cancelado', 'Cancelado');
+  { title: 'Paso 1', content: 'Bienvenido al wizard' },
+  { title: 'Paso 2', content: 'Segundo paso' },
+  { title: 'Paso 3', content: 'Último paso' }
+], {
+  onFinish: () => lumina.success('¡Wizard completado!')
 });
+```
+
+### Wizard con HTML Personalizado
+```javascript
+lumina.wizard([
+  { 
+    title: 'Datos Personales', 
+    content: `
+      <form style="text-align:left">
+        <label>Nombre:
+          <input type="text" style="width:100%;padding:8px;margin-top:5px">
+        </label>
+        <label>Email:
+          <input type="email" style="width:100%;padding:8px;margin-top:5px">
+        </label>
+      </form>
+    `,
+    allowHTML: true
+  },
+  { 
+    title: 'Preferencias', 
+    content: `
+      <div style="text-align:left">
+        <p>Selecciona tus intereses:</p>
+        <label><input type="checkbox"> Tecnología</label><br>
+        <label><input type="checkbox"> Deportes</label><br>
+        <label><input type="checkbox"> Música</label>
+      </div>
+    `,
+    allowHTML: true
+  }
+], {
+  theme: 'modern',
+  onFinish: () => lumina.success('Formulario enviado')
+});
+```
+
+### Wizard con Validación
+```javascript
+lumina.wizard([
+  { 
+    title: 'Paso 1', 
+    content: 'Este paso no tiene validación',
+    onBeforeNext: () => true
+  },
+  { 
+    title: 'Paso 2 - Validado', 
+    content: 'Debes aceptar para continuar',
+    onBeforeNext: () => {
+      const aceptado = document.querySelector('#aceptar').checked;
+      if (!aceptado) {
+        lumina.warning('Debes aceptar los términos');
+        return false;
+      }
+      return true;
+    }
+  }
+]);
 ```
 
 ## 🍞 Toast Notifications
 
 ```javascript
-// Toast básico
-lumina.toast('Mensaje guardado', 'success', {
-    position: 'top-right',  // top-right, top-left, bottom-right, bottom-left, top-center, bottom-center
-    timer: 3000             // Auto-close en ms
-});
-
-// Múltiples toasts
-lumina.toast('Procesando...', 'info');
-setTimeout(() => {
-    lumina.toast('¡Completado!', 'success');
-}, 1000);
-```
-
-## ⏳ Loading States
-
-```javascript
-// Loading simple
-const loading = lumina.loading('Cargando...');
-
-// Simular operación asíncrona
-setTimeout(() => {
-    loading.close();
-    lumina.success('Carga completada', 'Éxito');
-}, 2000);
-
-// Loading con tema personalizado
-lumina.loading('Procesando datos...', {
-    theme: 'modern',
-    overlayBlur: 8
+// Posiciones disponibles: top-right, top-left, bottom-right, bottom-left
+lumina.toast('Notificación importante', {
+  position: 'top-right',
+  theme: 'modern',
+  duration: 3000, // ms
+  icon: 'info'
 });
 ```
 
-## 📝 Modals Personalizados
+## 📦 Modals HTML Personalizados
 
 ```javascript
 lumina.modal(`
-    <div style="text-align: left;">
-        <h3>Contenido HTML Personalizado</h3>
-        <p>Puedes incluir cualquier contenido HTML.</p>
-        <ul>
-            <li>Elemento 1</li>
-            <li>Elemento 2</li>
-        </ul>
-    </div>
+  <div style="text-align: left; padding: 10px;">
+    <h3>📋 Detalles del Producto</h3>
+    <p><strong>Nombre:</strong> Producto Premium</p>
+    <p><strong>Precio:</strong> $99.99</p>
+    <ul>
+      <li>Característica 1</li>
+      <li>Característica 2</li>
+    </ul>
+  </div>
 `, {
-    title: 'Modal Personalizado',
-    width: '500px',
-    allowHTML: true,  // Importante para contenido HTML
-    showCancel: true
+  title: 'Información Detallada',
+  theme: 'modern',
+  width: '500px'
 });
 ```
 
-## ⚙️ Opciones de Configuración
+## 🔐 Modo Bloqueante
 
-### Opciones Globales
+Las alertas bloqueantes no se pueden cerrar con click fuera, Escape o botón X:
+
 ```javascript
-lumina.setDefaults({
-    theme: 'modern',
-    animation: 'zoom',
-    blocking: false,
-    closable: true,
-    overlay: true,
-    overlayBlur: 4,
-    allowHTML: false,
-    trapFocus: true,
-    closeOnOverlay: true,
-    closeOnEsc: true,
-    timer: 0,
-    width: '450px',
-    maxWidth: '90%',
-    borderRadius: '16px'
+lumina.alert({
+  title: '⚠ Términos y Condiciones',
+  text: 'Debes aceptar para continuar',
+  blocking: true,
+  closable: false,
+  showCloseButton: false,
+  showCancelButton: true,
+  confirmButtonText: 'Aceptar',
+  cancelButtonText: 'Rechazar'
+}).then(() => {
+  lumina.success('Términos aceptados');
+}).catch(() => {
+  lumina.error('Debes aceptar para continuar');
 });
 ```
 
-### Opciones por Alerta
+## ⏳ Timer Auto-Close
+
 ```javascript
-lumina.alert('Texto', 'Título', {
-    // Apariencia
-    theme: 'modern',           // Tema visual
-    animation: 'zoom',         // zoom, slide, bounce, fade, shake
-    width: '450px',            // Ancho personalizado
-    maxWidth: '90%',           // Ancho máximo
-    borderRadius: '16px',      // Bordes redondeados
-    
-    // Comportamiento
-    blocking: false,           // Modo bloqueante
-    closable: true,            // Mostrar botón X
-    overlay: true,             // Mostrar overlay
-    overlayBlur: 4,            // Blur del fondo
-    closeOnOverlay: true,      // Cerrar al hacer click fuera
-    closeOnEsc: true,          // Cerrar con Escape
-    trapFocus: true,           // Mantener foco dentro
-    
-    // Temporizador
-    timer: 0,                  // Auto-close en ms (0 = desactivado)
-    
-    // Botones
-    confirmButtonText: 'OK',
-    cancelButtonText: 'Cancelar',
-    showCancel: false,
-    
-    // Input
-    inputType: 'text',         // text, password, email
-    inputValue: '',            // Valor inicial
-    placeholder: '',           // Placeholder
-    inputValidator: null,      // Función de validación
-    
-    // Callbacks
-    onOpen: (instance) => {},
-    onClose: (action, payload) => {},
-    onConfirm: (value) => {},
-    onCancel: () => {},
-    
-    // Seguridad
-    allowHTML: false,          // Permitir HTML (peligroso si es user input)
-    
-    // Multimedia
-    sound: null,               // URL de sonido
-    icon: null                 // Icono personalizado
+lumina.info({
+  title: 'Redirigiendo...',
+  text: 'Serás redirigido automáticamente',
+  timer: 3000, // 3 segundos
+  timerProgressBar: true,
+  showConfirmButton: false
 });
 ```
 
 ## 🎭 Animaciones Disponibles
 
 ```javascript
-lumina.alert('Mensaje', 'Título', { animation: 'zoom' });   // Zoom in/out
-lumina.alert('Mensaje', 'Título', { animation: 'slide' });  // Slide from top
-lumina.alert('Mensaje', 'Título', { animation: 'bounce' }); // Bounce effect
-```
-
-## 🔧 Utilidades
-
-### Cerrar Todas las Alertas
-```javascript
-lumina.closeAll();
-```
-
-### Forzar Cierre de una Alerta Específica
-```javascript
-const alert = lumina.loading('Cargando...');
-alert.forceClose();
-```
-
-## 📊 Comparativa con Otras Librerías
-
-| Característica | Lumina v4.0 | SweetAlert2 | AlertifyJS |
-|---------------|-------------|-------------|------------|
-| Tamaño | ~18KB | ~35KB | ~25KB |
-| Dependencias | 0 | 0 | 0 |
-| Anti-XSS | ✅ Default | ⚠️ Manual | ⚠️ Manual |
-| Focus Trap | ✅ Completo | ✅ Parcial | ❌ |
-| Modo Blocking | ✅ Nativo | ⚠️ Workaround | ❌ |
-| Wizards | ✅ Nativo | ❌ | ❌ |
-| Toast | ✅ Incluido | ✅ Incluido | ✅ Incluido |
-| Temas | 12+ | 5 | 3 |
-| Accesibilidad | WCAG 2.1 | Parcial | Básica |
-| Input Validation | ✅ Real-time | ⚠️ On submit | ❌ |
-
-## 🎯 Casos de Uso Comunes
-
-### Formulario de Login
-```javascript
-lumina.prompt('Ingresa tu contraseña:', 'Login', {
-    inputType: 'password',
-    placeholder: '••••••••',
-    inputValidator: (val) => val.length >= 6 || 'Mínimo 6 caracteres'
-})
-.then((password) => {
-    // Procesar login
-})
-.catch(() => {});
-```
-
-### Confirmación de Eliminación
-```javascript
-lumina.confirm('¿Estás seguro de eliminar este archivo?', 'Eliminar Archivo', {
-    theme: 'error',
-    confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar'
-})
-.then(() => {
-    // Eliminar archivo
-})
-.catch(() => {});
-```
-
-### Términos y Condiciones (Blocking)
-```javascript
-lumina.modal('<p>Texto de los términos...</p>', {
-    title: 'Términos y Condiciones',
-    blocking: true,
-    closable: false,
-    closeOnEsc: false,
-    closeOnOverlay: false,
-    confirmButtonText: 'Aceptar',
-    showCancel: true,
-    cancelButtonText: 'Salir del sitio'
-})
-.then(() => {
-    // Usuario aceptó
-})
-.catch(() => {
-    // Usuario rechazó - redirigir o bloquear
-    window.location.href = '/goodbye';
+lumina.success({
+  text: 'Animación Zoom',
+  animation: 'zoom' // zoom, slide-up, fade, bounce, shake
 });
 ```
+
+## 📝 Todas las Opciones
+
+```javascript
+lumina.alert({
+  // Contenido
+  title: 'Título de la alerta',
+  text: 'Texto descriptivo',
+  html: '<p>HTML personalizado</p>', // Alternativa a text
+  icon: 'success', // success, error, warning, info, question, loading
+  
+  // Tema y Estilo
+  theme: 'modern', // Ver tabla de temas
+  allowHTML: false, // Permitir HTML en title/text
+  width: '400px',
+  borderRadius: '12px',
+  customClass: 'mi-clase-extra',
+  
+  // Comportamiento
+  blocking: false, // Prevenir cierre externo
+  closable: true, // Permitir cierre
+  showCloseButton: true, // Mostrar botón X
+  backdrop: true, // Mostrar overlay
+  animation: 'zoom', // zoom, slide-up, fade, bounce, shake
+  
+  // Botones
+  confirmButtonText: 'OK',
+  cancelButtonText: 'Cancel',
+  showCancelButton: false,
+  
+  // Inputs
+  input: null, // text, password, email, textarea
+  inputValue: '',
+  inputPlaceholder: '',
+  inputValidator: (value) => { /* retornar mensaje de error o undefined */ },
+  
+  // Timer
+  timer: null, // ms para auto-cerrar
+  timerProgressBar: false,
+  
+  // Callbacks
+  onConfirm: (result) => {},
+  onCancel: () => {},
+  onClose: () => {},
+  onOpen: (instance) => {}
+});
+```
+
+## 💼 Casos de Uso Reales
+
+### Eliminar Archivo
+```javascript
+lumina.confirm({
+  title: '🗑️ Eliminar Archivo',
+  text: '¿Estás seguro de eliminar "documento.pdf"?',
+  theme: 'error'
+}).then(() => {
+  lumina.toast('Archivo eliminado', { theme: 'success' });
+});
+```
+
+### Login Form
+```javascript
+lumina.alert({
+  title: 'Iniciar Sesión',
+  input: 'email',
+  inputPlaceholder: 'tu@email.com',
+  showCancelButton: true
+}).then((email) => {
+  const load = lumina.loading('Autenticando...');
+  setTimeout(() => {
+    load.close(true);
+    lumina.success(`Bienvenido, ${email}`);
+  }, 1500);
+});
+```
+
+### Onboarding
+```javascript
+lumina.wizard([
+  { title: '👋 Bienvenido', content: '¡Gracias por unirte!', icon: 'success' },
+  { title: '📧 Verifica tu email', content: 'Revisa tu bandeja', icon: 'info' },
+  { title: '🎨 Personaliza', content: 'Sube una foto de perfil', icon: 'question' },
+  { title: '✅ ¡Listo!', content: 'Comienza a explorar', icon: 'success' }
+], {
+  theme: 'gradient',
+  finishButtonText: 'Comenzar'
+});
+```
+
+## 🔒 Seguridad
+
+Lumina Alerts protege contra ataques XSS escapando todo el texto por defecto:
+
+```javascript
+// SEGURO - El texto se escapa automáticamente
+lumina.alert({ text: '<script>alert("XSS")</script>' }); 
+// Muestra literalmente "<script>alert("XSS")</script>"
+
+// HTML explícito (solo cuando es necesario)
+lumina.alert({ 
+  html: '<strong>Negrita</strong>', 
+  allowHTML: true 
+});
+```
+
+## ♿ Accesibilidad
+
+- **Focus Trap**: El foco no sale del modal
+- **Navegación por teclado**: Tab, Shift+Tab, Escape
+- **ARIA labels**: Roles y atributos accessibility
+- **Gestión de foco**: Se restaura al cerrar
+
+## 📱 Responsive
+
+Media queries optimizados para:
+- Móviles (< 480px): Botones full-width
+- Tablets (481-768px): Layout ajustado
+- Desktop (> 768px): Tamaño completo
 
 ## 🌐 Compatibilidad
 
 - ✅ Chrome/Edge (últimas versiones)
 - ✅ Firefox (últimas versiones)
 - ✅ Safari (últimas versiones)
-- ✅ IE11+ (con polyfills limitados)
-- ✅ Mobile (iOS Safari, Chrome Android)
-- ✅ Tablets
+- ✅ IE11+ (con polyfills)
+- ✅ iOS Safari
+- ✅ Android Chrome
 
 ## 📄 Licencia
 
-MIT License - Libre uso comercial y personal.
+MIT License - Libre para uso comercial y personal
 
 ---
 
-**Desarrollado con ❤️ por Lumina Dev Team**
+**Hecho con ❤️ para la web moderna**
 
-*Versión 4.0 - Lista para Producción*
+[Demo Interactiva](demo-lumina.html) | [GitHub](https://github.com/tu-repo/lumina-alerts)

@@ -1,818 +1,720 @@
 /**
- * Lumina Alerts v4.0 - Professional Edition
- * La librería de alertas definitiva: Segura, Rápida, Accesible y Moderna.
+ * Lumina Alerts v4.0 - Professional Alert Library
+ * Lightweight, Secure, Accessible, and Highly Customizable.
  * 
- * Características Clave:
- * - Motor de renderizado seguro (Anti-XSS por defecto)
- * - Focus Trap completo para accesibilidad (WCAG 2.1)
- * - Sistema de colas y gestión de estado
- * - Totalmente Responsive y Táctil
- * - Sin dependencias externas
- * 
- * @version 4.0.0
- * @author Lumina Dev Team
- * @license MIT
+ * Features:
+ * - Real Wizards (Multi-step inside single modal with navigation)
+ * - Dynamic Theming (Buttons adapt to theme colors)
+ * - Blocking Mode (Force interaction)
+ * - XSS Protection
+ * - 12+ Professional Themes
+ * - No Dependencies
  */
 
-(function (global, factory) {
+(function(global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     (global = global || self, global.lumina = factory());
-}(this, function () {
+}(this, function() {
     'use strict';
 
-    // --- 1. CONFIGURACIÓN Y ESTADO GLOBAL ---
+    // --- CONFIGURACIÓN Y CONSTANTES ---
     const VERSION = '4.0.0';
-    let instanceCount = 0;
-    let queue = [];
-    let isProcessingQueue = false;
+    const DEFAULT_Z_INDEX = 9999;
     
-    // Configuración por defecto
-    const defaults = {
-        theme: 'modern',
-        animation: 'zoom',
-        blocking: false,
-        closable: true,
-        overlay: true,
-        overlayBlur: 4,
-        allowHTML: false, // Seguridad: HTML desactivado por defecto
-        trapFocus: true,
-        closeOnOverlay: true,
-        closeOnEsc: true,
-        timer: 0,
-        width: '450px',
-        maxWidth: '90%',
-        borderRadius: '16px',
-        backdropColor: 'rgba(0, 0, 0, 0.6)',
-        sound: null,
-        onOpen: null,
-        onClose: null,
-        onConfirm: null,
-        onCancel: null,
-        inputValidator: null
+    // Paletas de colores por tema (Fondo, Texto, Borde, Botón Principal, Botón Secundario)
+    const THEMES = {
+        success:  { bg: '#d1fae5', text: '#065f46', border: '#34d399', btn: '#10b981', btnText: '#fff', btnSec: '#ecfdf5', btnSecText: '#047857' },
+        error:    { bg: '#fee2e2', text: '#991b1b', border: '#f87171', btn: '#ef4444', btnText: '#fff', btnSec: '#fef2f2', btnSecText: '#b91c1c' },
+        warning:  { bg: '#fef3c7', text: '#92400e', border: '#fbbf24', btn: '#f59e0b', btnText: '#fff', btnSec: '#fffbeb', btnSecText: '#b45309' },
+        info:     { bg: '#dbeafe', text: '#1e40af', border: '#60a5fa', btn: '#3b82f6', btnText: '#fff', btnSec: '#eff6ff', btnSecText: '#1d4ed8' },
+        question: { bg: '#e0e7ff', text: '#3730a3', border: '#818cf8', btn: '#6366f1', btnText: '#fff', btnSec: '#eef2ff', btnSecText: '#4338ca' },
+        dark:     { bg: '#1f2937', text: '#f9fafb', border: '#4b5563', btn: '#6b7280', btnText: '#fff', btnSec: '#374151', btnSecText: '#d1d5db' },
+        glass:    { bg: 'rgba(255, 255, 255, 0.7)', text: '#1f2937', border: 'rgba(255,255,255,0.5)', btn: 'rgba(0,0,0,0.8)', btnText: '#fff', btnSec: 'rgba(255,255,255,0.5)', btnSecText: '#000', backdrop: 'rgba(0,0,0,0.4)' },
+        neon:     { bg: '#0f172a', text: '#00f3ff', border: '#00f3ff', btn: '#bc13fe', btnText: '#fff', btnSec: '#1e293b', btnSecText: '#00f3ff', shadow: '0 0 15px #00f3ff' },
+        minimal:  { bg: '#ffffff', text: '#111827', border: '#e5e7eb', btn: '#000000', btnText: '#ffffff', btnSec: '#f3f4f6', btnSecText: '#1f2937' },
+        modern:   { bg: '#ffffff', text: '#1e293b', border: '#3b82f6', btn: '#3b82f6', btnText: '#fff', btnSec: '#f1f5f9', btnSecText: '#475569' },
+        gradient: { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', text: '#fff', border: 'transparent', btn: '#ffffff', btnText: '#764ba2', btnSec: 'rgba(255,255,255,0.2)', btnSecText: '#fff' },
+        sunset:   { bg: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', text: '#fff', border: 'transparent', btn: '#fff', btnText: '#fda085', btnSec: 'rgba(255,255,255,0.3)', btnSecText: '#fff' },
+        ocean:    { bg: 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)', text: '#fff', border: 'transparent', btn: '#fff', btnText: '#2193b0', btnSec: 'rgba(255,255,255,0.2)', btnSecText: '#fff' }
     };
 
-    // Temas profesionales mejorados
-    const themes = {
-        modern: { bg: '#ffffff', text: '#1f2937', iconBg: '#f3f4f6', ring: '#e5e7eb', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-        success: { bg: '#ffffff', text: '#065f46', iconBg: '#d1fae5', ring: '#34d399', gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
-        error:   { bg: '#ffffff', text: '#991b1b', iconBg: '#fee2e2', ring: '#f87171', gradient: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' },
-        warning: { bg: '#ffffff', text: '#92400e', iconBg: '#fef3c7', ring: '#fbbf24', gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' },
-        info:    { bg: '#ffffff', text: '#1e40af', iconBg: '#dbeafe', ring: '#60a5fa', gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
-        question:{ bg: '#ffffff', text: '#4c1d95', iconBg: '#ede9fe', ring: '#a78bfa', gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' },
-        dark:    { bg: '#1f2937', text: '#f9fafb', iconBg: '#374151', ring: '#4b5563', gradient: 'linear-gradient(135deg, #374151 0%, #111827 100%)' },
-        glass:   { bg: 'rgba(255, 255, 255, 0.7)', text: '#1f2937', iconBg: 'rgba(255,255,255,0.5)', ring: 'rgba(255,255,255,0.8)', backdrop: 'blur(12px)' },
-        neon:    { bg: '#0f172a', text: '#e2e8f0', iconBg: '#1e293b', ring: '#0ea5e9', glow: '0 0 20px rgba(14, 165, 233, 0.5)' },
-        minimal: { bg: '#ffffff', text: '#000000', iconBg: '#ffffff', ring: '#000000', border: '2px solid #000' },
-        sunset:  { bg: '#ffffff', text: '#431407', iconBg: '#ffedd5', ring: '#fb923c', gradient: 'linear-gradient(135deg, #f97316 0%, #db2777 100%)' },
-        ocean:   { bg: '#ffffff', text: '#0c4a6e', iconBg: '#e0f2fe', ring: '#0ea5e9', gradient: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)' }
+    // Iconos SVG
+    const ICONS = {
+        success: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>',
+        error:   '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>',
+        warning: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>',
+        info:    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+        question:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+        loading: '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="60" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></circle>'
     };
 
-    // Iconos SVG optimizados
-    const icons = {
-        success: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />',
-        error:   '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />',
-        warning: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />',
-        info:    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />',
-        question:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
-    };
-
-    // --- 2. UTILIDADES DE SEGURIDAD Y DOM ---
-
-    /**
-     * Escapa caracteres peligrosos para prevenir XSS
-     */
-    function escapeHtml(str) {
-        if (typeof str !== 'string') return str;
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return str.replace(/[&<>"']/g, m => map[m]);
-    }
-
-    /**
-     * Crea elementos DOM de forma segura
-     */
-    function createElement(tag, className, content, options = {}) {
-        const el = document.createElement(tag);
-        if (className) el.className = className;
-        
-        if (content) {
-            if (options.allowHTML) {
-                el.innerHTML = content;
-            } else {
-                el.textContent = content; // Seguro por defecto
-            }
-        }
-        return el;
-    }
-
-    /**
-     * Gestor de Focus Trap (Accesibilidad)
-     */
-    function trapFocus(container) {
-        const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-        const focusableElements = container.querySelectorAll(focusableSelectors);
-        const firstEl = focusableElements[0];
-        const lastEl = focusableElements[focusableElements.length - 1];
-
-        function handleKeyDown(e) {
-            if (e.key !== 'Tab') return;
-            
-            if (e.shiftKey) {
-                if (document.activeElement === firstEl) {
-                    lastEl.focus();
-                    e.preventDefault();
-                }
-            } else {
-                if (document.activeElement === lastEl) {
-                    firstEl.focus();
-                    e.preventDefault();
-                }
-            }
-        }
-
-        container.addEventListener('keydown', handleKeyDown);
-        
-        // Enfocar el primer elemento inmediatamente
-        if(firstEl) setTimeout(() => firstEl.focus(), 50);
-
-        return () => container.removeEventListener('keydown', handleKeyDown);
-    }
-
-    // --- 3. MOTOR DE ESTILOS (CSS-in-JS Optimizado) ---
-    
+    // --- GESTIÓN DE ESTILOS GLOBALES ---
     let styleInjected = false;
     function injectStyles() {
         if (styleInjected) return;
-        
         const css = `
-            :root {
-                --lumina-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                --lumina-backdrop: rgba(0,0,0,0.4);
-            }
-            .lumina-overlay {
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                z-index: 9999; display: flex; align-items: center; justify-content: center;
-                opacity: 0; transition: opacity 0.3s ease;
-                background: var(--lumina-backdrop);
-                -webkit-tap-highlight-color: transparent;
-            }
+            @keyframes lumina-zoom { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+            @keyframes lumina-slide-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+            @keyframes lumina-fade { 0% { opacity: 0; } 100% { opacity: 1; } }
+            @keyframes lumina-bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+            @keyframes lumina-shake { 0%, 100% {transform: translateX(0);} 10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);} 20%, 40%, 60%, 80% {transform: translateX(5px);} }
+            
+            .lumina-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: ${DEFAULT_Z_INDEX}; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
             .lumina-overlay.visible { opacity: 1; }
-            .lumina-overlay.blocking { pointer-events: auto; }
-            .lumina-overlay:not(.blocking) { pointer-events: none; }
-            .lumina-overlay:not(.blocking) .lumina-modal { pointer-events: auto; }
+            .lumina-overlay.blocking { cursor: not-allowed; }
             
-            .lumina-modal {
-                background: #fff; border-radius: 16px;
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-                padding: 24px; width: 450px; max-width: 90%;
-                transform: scale(0.9); opacity: 0;
-                transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-                display: flex; flex-direction: column; gap: 16px;
-                position: relative; outline: none;
-                font-family: var(--lumina-font);
-                backface-visibility: hidden;
-            }
-            .lumina-overlay.visible .lumina-modal { transform: scale(1); opacity: 1; }
+            .lumina-modal { background: #fff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-width: 90%; width: 400px; position: relative; display: flex; flex-direction: column; overflow: hidden; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; }
+            .lumina-overlay.visible .lumina-modal { transform: scale(1); }
             
-            /* Animations */
-            .lumina-anim-slide .lumina-modal { transform: translateY(-50px); }
-            .lumina-anim-slide.visible .lumina-modal { transform: translateY(0); }
-            
-            .lumina-anim-bounce .lumina-modal { transform: scale(0.5); }
-            .lumina-anim-bounce.visible .lumina-modal { transform: scale(1); }
-            
-            /* Header & Content */
-            .lumina-header { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
-            .lumina-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+            .lumina-header { padding: 20px 20px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+            .lumina-icon { width: 48px; height: 48px; margin-bottom: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
             .lumina-icon svg { width: 28px; height: 28px; }
-            .lumina-title { font-size: 1.5rem; font-weight: 700; margin: 0; line-height: 1.2; }
-            .lumina-content { font-size: 1rem; color: #4b5563; text-align: center; margin: 0; line-height: 1.5; }
+            .lumina-title { font-size: 1.5rem; font-weight: 600; margin: 0 0 10px; line-height: 1.2; }
+            .lumina-content { padding: 0 20px 20px; text-align: center; font-size: 1rem; color: #555; overflow-y: auto; }
+            .lumina-content p { margin: 0; }
             
-            /* Inputs */
-            .lumina-input-group { width: 100%; display: flex; flex-direction: column; gap: 8px; }
-            .lumina-input {
-                width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;
-                font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; outline: none;
-                font-family: inherit; box-sizing: border-box;
-            }
-            .lumina-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-            .lumina-input.error { border-color: #ef4444; }
-            .lumina-error-msg { color: #ef4444; font-size: 0.875rem; display: none; margin-top: 4px; }
-            
-            /* Actions */
-            .lumina-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
-            .lumina-btn {
-                padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem;
-                cursor: pointer; transition: all 0.2s; border: none; outline: none;
-                font-family: inherit; min-width: 100px;
-            }
+            .lumina-actions { padding: 15px 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid rgba(0,0,0,0.05); }
+            .lumina-btn { padding: 10px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; font-size: 0.95rem; transition: all 0.2s; outline: none; min-width: 80px; }
             .lumina-btn:active { transform: scale(0.96); }
-            .lumina-btn-confirm { background: #6366f1; color: white; }
-            .lumina-btn-confirm:hover { background: #4f46e5; }
-            .lumina-btn-cancel { background: #f3f4f6; color: #374151; }
-            .lumina-btn-cancel:hover { background: #e5e7eb; }
-            .lumina-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+            .lumina-btn:focus-visible { box-shadow: 0 0 0 3px rgba(0,0,0,0.2); }
+            
+            /* Wizard Styles */
+            .lumina-wizard-steps { display: flex; justify-content: center; gap: 5px; margin-bottom: 15px; }
+            .lumina-step-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.2); transition: all 0.3s; cursor: pointer; }
+            .lumina-step-dot.active { transform: scale(1.3); }
+            .lumina-wizard-content { min-height: 100px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+            .lumina-step-content { display: none; width: 100%; animation: lumina-fade 0.3s ease; }
+            .lumina-step-content.active { display: block; }
 
-            /* Close Button */
-            .lumina-close {
-                position: absolute; top: 12px; right: 12px; background: transparent; border: none;
-                font-size: 1.5rem; color: #9ca3af; cursor: pointer; padding: 4px; line-height: 1;
-            }
-            .lumina-close:hover { color: #4b5563; }
-
-            /* Toasts */
-            .lumina-toast-container {
-                position: fixed; z-index: 10000; display: flex; flex-direction: column; gap: 10px;
-                pointer-events: none;
-            }
-            .lumina-toast {
-                pointer-events: auto; background: #fff; padding: 16px 20px; border-radius: 12px;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                display: flex; align-items: center; gap: 12px; min-width: 300px; max-width: 400px;
-                transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                font-family: var(--lumina-font); border-left: 4px solid transparent;
-            }
-            .lumina-toast.show { transform: translateX(0); }
-            .lumina-toast.hide { transform: translateX(120%); opacity: 0; }
-
-            /* Wizard Steps */
-            .lumina-wizard-steps { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
-            .lumina-step-dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e7eb; transition: all 0.3s; }
-            .lumina-step-dot.active { background: #6366f1; width: 24px; border-radius: 5px; }
-            .lumina-step-dot.completed { background: #10b981; }
+            /* Toast Styles */
+            .lumina-toast-container { position: fixed; z-index: ${DEFAULT_Z_INDEX + 1}; display: flex; flex-direction: column; gap: 10px; max-width: 350px; width: 90%; pointer-events: none; }
+            .lumina-toast { pointer-events: auto; display: flex; align-items: center; padding: 12px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(100%); opacity: 0; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+            .lumina-toast.show { transform: translateX(0); opacity: 1; }
+            .lumina-toast.hide { transform: translateX(100%); opacity: 0; }
+            .lumina-toast-icon { margin-right: 12px; flex-shrink: 0; }
+            .lumina-toast-msg { font-size: 0.9rem; font-weight: 500; }
 
             /* Responsive */
-            @media (max-width: 640px) {
-                .lumina-modal { width: 90%; padding: 20px; }
-                .lumina-actions { flex-direction: column-reverse; }
+            @media (max-width: 480px) {
+                .lumina-modal { width: 95%; }
+                .lumina-actions { flex-direction: column; }
                 .lumina-btn { width: 100%; }
-                .lumina-toast-container { left: 16px; right: 16px; bottom: 16px; top: auto !important; }
-                .lumina-toast { min-width: auto; width: 100%; }
             }
         `;
-        
         const style = document.createElement('style');
+        style.id = 'lumina-styles';
         style.textContent = css;
         document.head.appendChild(style);
         styleInjected = true;
     }
 
-    // --- 4. CLASE PRINCIPAL DE ALERTA ---
+    // --- UTILIDADES ---
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
 
+    function generateId() {
+        return 'lumina-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function getThemeStyles(themeName) {
+        return THEMES[themeName] || THEMES.minimal;
+    }
+
+    // --- CLASE PRINCIPAL ---
     class LuminaAlert {
         constructor(options = {}) {
-            this.id = ++instanceCount;
-            this.options = { ...defaults, ...options };
+            this.id = generateId();
+            this.options = {
+                title: '',
+                text: '',
+                icon: null,
+                theme: 'modern',
+                allowHTML: false,
+                blocking: false,
+                closable: true,
+                showCloseButton: true,
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Cancel',
+                showCancelButton: false,
+                input: null,
+                inputValue: '',
+                inputPlaceholder: '',
+                inputValidator: null,
+                timer: null,
+                timerProgressBar: false,
+                onConfirm: null,
+                onCancel: null,
+                onClose: null,
+                onOpen: null,
+                width: null,
+                borderRadius: '12px',
+                animation: 'zoom',
+                position: 'center',
+                customClass: '',
+                backdrop: true,
+                html: '',
+                ...options
+            };
+
+            this.themeStyles = getThemeStyles(this.options.theme);
             this.isOpen = false;
-            this.timerId = null;
             this.resolvePromise = null;
             this.rejectPromise = null;
-            this.elements = {};
+            this.timerTimeout = null;
             
-            // Normalizar contenido
-            if (!this.options.allowHTML) {
-                if (this.options.title) this.options.title = escapeHtml(this.options.title);
-                if (this.options.text) this.options.text = escapeHtml(this.options.text);
-            }
-
             this.init();
         }
 
         init() {
             injectStyles();
-            this.render();
+            this.createDOM();
+            this.applyStyles();
             this.attachEvents();
             
-            // Pequeño delay para permitir que el DOM se renderice antes de animar
-            requestAnimationFrame(() => {
-                this.open();
-                if (this.options.timer > 0) {
-                    this.startTimer();
-                }
-            });
+            document.body.appendChild(this.overlay);
+            void this.overlay.offsetWidth;
+            this.overlay.classList.add('visible');
+            this.isOpen = true;
 
-            if (this.options.sound) {
-                const audio = new Audio(this.options.sound);
-                audio.play().catch(() => {}); // Ignorar errores de autoplay
+            if (this.options.onOpen) this.options.onOpen(this);
+
+            const firstBtn = this.modal.querySelector('button');
+            if (firstBtn) setTimeout(() => firstBtn.focus(), 50);
+
+            if (this.options.timer) {
+                this.startTimer(this.options.timer);
             }
+
+            return new Promise((resolve, reject) => {
+                this.resolvePromise = resolve;
+                this.rejectPromise = reject;
+            });
         }
 
-        render() {
-            // Overlay
-            this.elements.overlay = document.createElement('div');
-            this.elements.overlay.className = `lumina-overlay ${this.options.blocking ? 'blocking' : ''}`;
-            this.elements.overlay.style.backdropFilter = `blur(${this.options.overlayBlur}px)`;
-            this.elements.overlay.style.backgroundColor = this.options.overlay ? this.options.backdropColor : 'transparent';
-            if (!this.options.overlay) this.elements.overlay.style.pointerEvents = 'none';
+        createDOM() {
+            this.overlay = document.createElement('div');
+            this.overlay.className = `lumina-overlay ${this.options.blocking ? 'blocking' : ''}`;
+            this.overlay.id = this.id;
+            this.overlay.setAttribute('role', 'dialog');
+            this.overlay.setAttribute('aria-modal', 'true');
 
-            // Modal
-            this.elements.modal = document.createElement('div');
-            this.elements.modal.className = `lumina-modal lumina-anim-${this.options.animation}`;
-            this.elements.modal.style.width = this.options.width;
-            this.elements.modal.style.maxWidth = this.options.maxWidth;
-            this.elements.modal.style.borderRadius = this.options.borderRadius;
+            this.modal = document.createElement('div');
+            this.modal.className = `lumina-modal ${this.options.customClass}`;
             
-            // Aplicar tema
-            const theme = themes[this.options.theme] || themes.modern;
-            this.elements.modal.style.background = theme.bg;
-            this.elements.modal.style.color = theme.text;
-            if (theme.glow) this.elements.modal.style.boxShadow = `${this.elements.modal.style.boxShadow}, ${theme.glow}`;
-            if (theme.border) this.elements.modal.style.border = theme.border;
-
-            // Estructura interna
-            let htmlContent = '';
+            const header = document.createElement('div');
+            header.className = 'lumina-header';
             
-            // Icono
-            if (this.options.icon || ['success','error','warning','info','question'].includes(this.options.theme)) {
-                const iconType = this.options.icon || this.options.theme;
-                const iconPath = icons[iconType] || icons.info;
-                const iconBg = theme.iconBg || '#f3f4f6';
-                const iconColor = theme.ring || '#6366f1';
-                
-                htmlContent += `
-                    <div class="lumina-header">
-                        <div class="lumina-icon" style="background: ${iconBg}; color: ${iconColor}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${iconPath}</svg>
-                        </div>
-                `;
-            } else {
-                htmlContent += `<div class="lumina-header">`;
+            if (this.options.icon) {
+                const iconContainer = document.createElement('div');
+                iconContainer.className = 'lumina-icon';
+                iconContainer.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS[this.options.icon] || ICONS.info}</svg>`;
+                header.appendChild(iconContainer);
             }
 
-            // Título y Texto
             if (this.options.title) {
-                htmlContent += `<h2 class="lumina-title">${this.options.title}</h2>`;
-            }
-            if (this.options.text) {
-                htmlContent += `<p class="lumina-content">${this.options.text}</p>`;
-            }
-            htmlContent += `</div>`; // Cerrar header
-
-            // Input (si existe)
-            if (this.options.inputType) {
-                const inputType = this.options.inputType === 'password' ? 'password' : 
-                                  this.options.inputType === 'email' ? 'email' : 'text';
-                htmlContent += `
-                    <div class="lumina-input-group">
-                        <input type="${inputType}" class="lumina-input" placeholder="${this.options.placeholder || ''}" value="${this.options.inputValue || ''}">
-                        <div class="lumina-error-msg">Invalid input</div>
-                    </div>
-                `;
+                const title = document.createElement('h2');
+                title.className = 'lumina-title';
+                title.innerHTML = this.options.allowHTML ? this.options.title : escapeHtml(this.options.title);
+                header.appendChild(title);
             }
 
-            // Botones
-            htmlContent += `<div class="lumina-actions">`;
+            this.modal.appendChild(header);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'lumina-content';
             
-            // Botón Cancelar (si no es blocking o si se permite cancelar)
-            if (!this.options.blocking || this.options.showCancel) {
-                const cancelText = this.options.cancelButtonText || 'Cancelar';
-                htmlContent += `<button class="lumina-btn lumina-btn-cancel" data-action="cancel">${escapeHtml(cancelText)}</button>`;
+            // HTML personalizado (para Wizards y Modals)
+            if (this.options.html) {
+                const htmlDiv = document.createElement('div');
+                htmlDiv.innerHTML = this.options.html;
+                contentDiv.appendChild(htmlDiv);
+            } else {
+                // Input handling
+                if (this.options.input) {
+                    const input = document.createElement(this.options.input === 'textarea' ? 'textarea' : 'input');
+                    input.type = this.options.input;
+                    input.value = this.options.inputValue;
+                    input.placeholder = this.options.inputPlaceholder;
+                    input.className = 'lumina-input';
+                    input.style.width = '100%';
+                    input.style.padding = '10px';
+                    input.style.marginTop = '10px';
+                    input.style.border = '1px solid #ddd';
+                    input.style.borderRadius = '6px';
+                    input.style.boxSizing = 'border-box';
+                    contentDiv.appendChild(input);
+                    this.inputElement = input;
+                }
+
+                if (this.options.text) {
+                    const textP = document.createElement('p');
+                    textP.innerHTML = this.options.allowHTML ? this.options.text : escapeHtml(this.options.text);
+                    if(this.options.input) textP.style.marginTop = '10px';
+                    contentDiv.appendChild(textP);
+                }
             }
 
-            // Botón Confirmar
-            const confirmText = this.options.confirmButtonText || 'OK';
-            const confirmDisabled = this.options.inputType && !this.options.inputValue ? ' disabled' : '';
-            htmlContent += `<button class="lumina-btn lumina-btn-confirm"${confirmDisabled} data-action="confirm">${escapeHtml(confirmText)}</button>`;
+            this.modal.appendChild(contentDiv);
+
+            const actions = document.createElement('div');
+            actions.className = 'lumina-actions';
+
+            if (this.options.showCancelButton) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'lumina-btn lumina-btn-cancel';
+                cancelBtn.textContent = this.options.cancelButtonText;
+                cancelBtn.type = 'button';
+                actions.appendChild(cancelBtn);
+                this.cancelBtn = cancelBtn;
+            }
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'lumina-btn lumina-btn-confirm';
+            confirmBtn.textContent = this.options.confirmButtonText;
+            confirmBtn.type = 'button';
+            actions.appendChild(confirmBtn);
+            this.confirmBtn = confirmBtn;
+
+            this.modal.appendChild(actions);
+
+            if (this.options.showCloseButton && !this.options.blocking) {
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '&times;';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '10px';
+                closeBtn.style.right = '15px';
+                closeBtn.style.background = 'transparent';
+                closeBtn.style.border = 'none';
+                closeBtn.style.fontSize = '24px';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.color = 'inherit';
+                closeBtn.style.opacity = '0.5';
+                closeBtn.onmouseover = () => closeBtn.style.opacity = '1';
+                closeBtn.onmouseout = () => closeBtn.style.opacity = '0.5';
+                this.closeBtn = closeBtn;
+                this.modal.appendChild(closeBtn);
+            }
+
+            this.overlay.appendChild(this.modal);
+        }
+
+        applyStyles() {
+            const ts = this.themeStyles;
             
-            htmlContent += `</div>`;
-
-            // Botón cerrar (X)
-            if (this.options.closable && !this.options.blocking) {
-                htmlContent += `<button class="lumina-close" data-action="close">&times;</button>`;
+            if (this.options.backdrop) {
+                this.overlay.style.backgroundColor = ts.backdrop || 'rgba(0,0,0,0.5)';
+            } else {
+                this.overlay.style.pointerEvents = 'none';
+                this.overlay.style.backgroundColor = 'transparent';
+                this.modal.style.pointerEvents = 'auto';
             }
 
-            this.elements.modal.innerHTML = htmlContent;
-            this.elements.overlay.appendChild(this.elements.modal);
-            document.body.appendChild(this.elements.overlay);
-
-            // Referencias a inputs
-            if (this.options.inputType) {
-                this.elements.input = this.elements.modal.querySelector('.lumina-input');
-                this.elements.errorMsg = this.elements.modal.querySelector('.lumina-error-msg');
+            if (typeof ts.bg === 'string' && ts.bg.includes('gradient')) {
+                this.modal.style.background = ts.bg;
+                this.modal.style.color = ts.text;
+            } else {
+                this.modal.style.backgroundColor = ts.bg;
+                this.modal.style.color = ts.text;
             }
+            if (ts.border !== 'transparent') this.modal.style.border = `1px solid ${ts.border}`;
+            if (this.options.width) this.modal.style.width = this.options.width;
+            this.modal.style.borderRadius = this.options.borderRadius;
+            if (ts.shadow) this.modal.style.boxShadow = ts.shadow;
+
+            const iconContainer = this.modal.querySelector('.lumina-icon');
+            if (iconContainer) {
+                iconContainer.style.backgroundColor = ts.btnSec;
+                iconContainer.style.color = ts.btn;
+                if(ts.btn.includes('gradient')) {
+                     iconContainer.style.background = ts.btn;
+                     iconContainer.style.color = '#fff';
+                }
+            }
+
+            const title = this.modal.querySelector('.lumina-title');
+            if (title) title.style.color = ts.text;
+
+            const confirmBtn = this.modal.querySelector('.lumina-btn-confirm');
+            if (confirmBtn) {
+                confirmBtn.style.backgroundColor = ts.btn;
+                confirmBtn.style.color = ts.btnText;
+                confirmBtn.style.border = `1px solid ${ts.btn}`;
+                confirmBtn.onmouseover = () => {
+                    confirmBtn.style.filter = 'brightness(1.1)';
+                    confirmBtn.style.transform = 'translateY(-1px)';
+                };
+                confirmBtn.onmouseout = () => {
+                    confirmBtn.style.filter = 'none';
+                    confirmBtn.style.transform = 'none';
+                };
+            }
+
+            const cancelBtn = this.modal.querySelector('.lumina-btn-cancel');
+            if (cancelBtn) {
+                cancelBtn.style.backgroundColor = ts.btnSec;
+                cancelBtn.style.color = ts.btnSecText;
+                cancelBtn.style.border = `1px solid ${ts.btnSec === 'transparent' ? ts.border : ts.btnSec}`;
+                cancelBtn.onmouseover = () => cancelBtn.style.filter = 'brightness(0.95)';
+                cancelBtn.onmouseout = () => cancelBtn.style.filter = 'none';
+            }
+
+            if (this.inputElement) {
+                this.inputElement.style.borderColor = ts.border;
+                this.inputElement.style.color = ts.text;
+                this.inputElement.style.background = ts.btnSec === 'transparent' ? '#fff' : ts.btnSec;
+                this.inputElement.onfocus = () => this.inputElement.style.boxShadow = `0 0 0 2px ${ts.btn}40`;
+                this.inputElement.onblur = () => this.inputElement.style.boxShadow = 'none';
+            }
+
+            if (this.closeBtn) {
+                this.closeBtn.style.color = ts.text;
+            }
+
+            this.modal.style.animation = `lumina-${this.options.animation} 0.4s ease forwards`;
         }
 
         attachEvents() {
-            // Click en Overlay
-            this.elements.overlay.addEventListener('click', (e) => {
-                if (e.target === this.elements.overlay && this.options.closeOnOverlay && !this.options.blocking) {
-                    this.close('overlay');
+            this.confirmBtn.addEventListener('click', () => this.handleConfirm());
+            
+            if (this.cancelBtn) {
+                this.cancelBtn.addEventListener('click', () => this.handleCancel());
+            }
+
+            if (this.closeBtn) {
+                this.closeBtn.addEventListener('click', () => this.handleCancel());
+            }
+
+            this.overlay.addEventListener('click', (e) => {
+                if (e.target === this.overlay && !this.options.blocking && this.options.closable) {
+                    this.handleCancel();
                 }
             });
 
-            // Tecla Escape
-            this._escHandler = (e) => {
-                if (e.key === 'Escape' && this.options.closeOnEsc && !this.options.blocking) {
-                    this.close('escape');
+            this.escHandler = (e) => {
+                if (e.key === 'Escape' && !this.options.blocking && this.options.closable) {
+                    this.handleCancel();
                 }
             };
-            document.addEventListener('keydown', this._escHandler);
+            document.addEventListener('keydown', this.escHandler);
 
-            // Botones
-            this.elements.modal.addEventListener('click', (e) => {
-                const btn = e.target.closest('button');
-                if (!btn) return;
-                
-                const action = btn.dataset.action;
-                if (action === 'confirm') this.handleConfirm();
-                if (action === 'cancel') this.close('cancel');
-                if (action === 'close') this.close('close');
-            });
-
-            // Input validation en tiempo real
-            if (this.elements.input) {
-                this.elements.input.addEventListener('input', () => {
-                    const val = this.elements.input.value.trim();
-                    const confirmBtn = this.elements.modal.querySelector('[data-action="confirm"]');
-                    
-                    if (this.options.inputValidator) {
-                        const isValid = this.options.inputValidator(val);
-                        if (isValid === true) {
-                            confirmBtn.disabled = false;
-                            this.elements.errorMsg.style.display = 'none';
-                            this.elements.input.classList.remove('error');
-                        } else {
-                            confirmBtn.disabled = true;
-                            // No mostrar error hasta que intente enviar
-                        }
-                    } else {
-                        confirmBtn.disabled = val.length === 0;
-                    }
-                });
-                
-                // Enter para confirmar
-                this.elements.input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !this.elements.modal.querySelector('[data-action="confirm"]').disabled) {
-                        this.handleConfirm();
-                    }
+            if (this.inputElement) {
+                this.inputElement.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') this.handleConfirm();
                 });
             }
-
-            // Focus Trap
-            if (this.options.trapFocus) {
-                this._releaseFocus = trapFocus(this.elements.modal);
-            }
-            
-            // Prevenir scroll en body
-            document.body.style.overflow = 'hidden';
-            // Ajustar padding-right si hay scrollbar
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            if (scrollbarWidth > 0) {
-                document.body.style.paddingRight = `${scrollbarWidth}px`;
-            }
-        }
-
-        open() {
-            this.isOpen = true;
-            this.elements.overlay.classList.add('visible');
-            if (this.options.onOpen) this.options.onOpen(this);
         }
 
         handleConfirm() {
-            let value = true;
-            if (this.elements.input) {
-                value = this.elements.input.value.trim();
+            if (this.inputElement) {
+                const val = this.inputElement.value;
                 if (this.options.inputValidator) {
-                    const valid = this.options.inputValidator(value);
-                    if (valid !== true) {
-                        this.elements.errorMsg.textContent = typeof valid === 'string' ? valid : 'Entrada inválida';
-                        this.elements.errorMsg.style.display = 'block';
-                        this.elements.input.classList.add('error');
-                        this.elements.input.focus();
-                        return; // Detener
+                    const errorMsg = this.options.inputValidator(val);
+                    if (errorMsg) {
+                        const originalBorder = this.inputElement.style.borderColor;
+                        this.inputElement.style.borderColor = '#ef4444';
+                        setTimeout(() => this.inputElement.style.borderColor = originalBorder, 2000);
+                        return;
                     }
                 }
+                this.resultValue = val;
             }
 
-            if (this.options.onConfirm) {
-                const result = this.options.onConfirm(value);
-                if (result instanceof Promise) {
-                    // Mostrar loading state si es promesa
-                    const btn = this.elements.modal.querySelector('[data-action="confirm"]');
-                    const originalText = btn.textContent;
-                    btn.disabled = true;
-                    btn.textContent = '...';
-                    
-                    result.then(res => {
-                        this.close('confirm', res);
-                    }).catch(err => {
-                        btn.disabled = false;
-                        btn.textContent = originalText;
-                        // Manejar error
-                    });
-                    return;
-                }
-            }
-            
-            this.close('confirm', value);
+            this.close(true);
         }
 
-        close(action = 'unknown', payload = null) {
+        handleCancel() {
+            this.close(false);
+        }
+
+        startTimer(ms) {
+            if (this.options.timerProgressBar) {
+                const bar = document.createElement('div');
+                bar.style.height = '3px';
+                bar.style.background = this.themeStyles.btn;
+                bar.style.width = '100%';
+                bar.style.position = 'absolute';
+                bar.style.bottom = '0';
+                bar.style.left = '0';
+                bar.style.transition = `width ${ms}ms linear`;
+                this.modal.appendChild(bar);
+                setTimeout(() => bar.style.width = '0%', 50);
+            }
+
+            this.timerTimeout = setTimeout(() => {
+                this.handleConfirm();
+            }, ms);
+        }
+
+        close(confirmed) {
             if (!this.isOpen) return;
             this.isOpen = false;
-            
-            clearTimeout(this.timerId);
-            if (this._releaseFocus) this._releaseFocus();
-            document.removeEventListener('keydown', this._escHandler);
 
-            this.elements.overlay.classList.remove('visible');
-            
-            // Esperar a que termine la animación
+            if (this.timerTimeout) clearTimeout(this.timerTimeout);
+            document.removeEventListener('keydown', this.escHandler);
+
+            this.overlay.classList.remove('visible');
+            this.modal.style.transform = 'scale(0.9)';
+            this.modal.style.opacity = '0';
+
             setTimeout(() => {
-                if (this.elements.overlay.parentNode) {
-                    this.elements.overlay.parentNode.removeChild(this.elements.overlay);
-                }
-                // Restaurar scroll
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-                
-                if (this.options.onClose) this.options.onClose(action, payload);
-                
-                // Resolver promesa
-                if (this.resolvePromise) {
-                    if (action === 'confirm') this.resolvePromise(payload);
-                    else if (action === 'cancel' || action === 'close' || action === 'overlay' || action === 'escape') {
-                        if (this.options.blocking) this.resolvePromise(payload); // En blocking, siempre resuelve
-                        else this.rejectPromise({ dismissedBy: action });
-                    }
+                if (this.overlay.parentNode) {
+                    this.overlay.parentNode.removeChild(this.overlay);
                 }
                 
-                // Procesar cola
-                processQueue();
+                if (this.options.onClose) this.options.onClose();
+
+                if (confirmed) {
+                    if (this.options.onConfirm) this.options.onConfirm(this.resultValue !== undefined ? this.resultValue : true);
+                    if (this.resolvePromise) this.resolvePromise(this.resultValue !== undefined ? this.resultValue : true);
+                } else {
+                    if (this.options.onCancel) this.options.onCancel();
+                    if (this.rejectPromise) this.rejectPromise('cancelled');
+                }
             }, 300);
         }
 
-        startTimer() {
-            let remaining = this.options.timer;
-            const step = 100;
-            
-            this.timerId = setInterval(() => {
-                remaining -= step;
-                if (remaining <= 0) this.close('timer');
-            }, step);
-            
-            // Pausar en hover
-            this.elements.modal.addEventListener('mouseenter', () => clearInterval(this.timerId));
-            this.elements.modal.addEventListener('mouseleave', () => {
-                if (this.isOpen && !this.timerId) this.startTimer(); // Reiniciar lógica simplificada
-            });
-        }
-
-        then(resolve, reject) {
-            return new Promise((res, rej) => {
-                this.resolvePromise = res;
-                this.rejectPromise = rej;
-            }).then(resolve, reject);
+        forceClose(confirmed = true) {
+            this.close(confirmed);
         }
         
-        // Método para forzar cierre (útil en blocking si se cumple condición externa)
-        forceClose(result) {
-            this.close('force', result);
+        updateContent(newText) {
+            const contentDiv = this.modal.querySelector('.lumina-content p');
+            if(contentDiv) contentDiv.innerHTML = this.options.allowHTML ? newText : escapeHtml(newText);
         }
     }
 
-    // --- 5. GESTIÓN DE COLA ---
-    
-    function processQueue() {
-        if (isProcessingQueue || queue.length === 0) return;
-        
-        isProcessingQueue = true;
-        const next = queue.shift();
-        const alert = new LuminaAlert(next.options);
-        
-        alert.then(
-            (res) => { if(next.resolve) next.resolve(res); },
-            (err) => { if(next.reject) next.reject(err); }
-        ).finally(() => {
-            isProcessingQueue = false;
-            processQueue();
-        });
-    }
-
-    // --- 6. API PÚBLICA ---
-
-    const lumina = {
-        version: VERSION,
-        
-        // Configuración global
-        setDefaults: (newDefaults) => {
-            Object.assign(defaults, newDefaults);
-        },
-
-        // Métodos rápidos
-        alert: (text, title, options = {}) => {
-            if (typeof title === 'object') { options = title; title = null; }
-            return new LuminaAlert({ text, title, ...options });
-        },
-        
-        success: (text, title = '¡Éxito!', options = {}) => {
-            return new LuminaAlert({ text, title, theme: 'success', icon: 'success', ...options });
-        },
-        
-        error: (text, title = 'Error', options = {}) => {
-            return new LuminaAlert({ text, title, theme: 'error', icon: 'error', ...options });
-        },
-        
-        warning: (text, title = 'Advertencia', options = {}) => {
-            return new LuminaAlert({ text, title, theme: 'warning', icon: 'warning', ...options });
-        },
-        
-        info: (text, title = 'Información', options = {}) => {
-            return new LuminaAlert({ text, title, theme: 'info', icon: 'info', ...options });
-        },
-        
-        question: (text, title = 'Pregunta', options = {}) => {
-            return new LuminaAlert({ text, title, theme: 'question', icon: 'question', ...options });
-        },
-
-        // Confirmación estándar
-        confirm: (text, title = '¿Estás seguro?', options = {}) => {
-            return new LuminaAlert({ 
-                text, title, icon: 'question', 
-                showCancel: true, 
-                confirmButtonText: 'Sí', 
-                cancelButtonText: 'No',
-                ...options 
-            });
-        },
-
-        // Prompt con input
-        prompt: (text, title = 'Ingrese datos', options = {}) => {
-            return new LuminaAlert({
-                text, title, icon: 'info',
-                inputType: 'text',
-                showCancel: true,
+    // --- WIZARD ENGINE (Real Multi-step) ---
+    class LuminaWizard {
+        constructor(steps, options = {}) {
+            this.steps = steps;
+            this.currentStep = 0;
+            this.options = {
+                theme: 'modern',
+                confirmButtonText: 'Siguiente',
+                cancelButtonText: 'Atrás',
+                finishButtonText: 'Finalizar',
+                showProgress: true,
                 ...options
+            };
+            this.instance = null;
+            this.init();
+        }
+
+        init() {
+            const currentStepData = this.steps[this.currentStep];
+            
+            let stepContentHTML = '';
+            if (this.options.showProgress) {
+                stepContentHTML += `<div class="lumina-wizard-steps">`;
+                this.steps.forEach((_, idx) => {
+                    stepContentHTML += `<div class="lumina-step-dot ${idx === this.currentStep ? 'active' : ''}" data-step="${idx}"></div>`;
+                });
+                stepContentHTML += `</div>`;
+            }
+
+            stepContentHTML += `<div class="lumina-wizard-content">`;
+            this.steps.forEach((step, idx) => {
+                const isActive = idx === this.currentStep ? 'active' : '';
+                const content = step.allowHTML ? step.content : escapeHtml(step.content);
+                const iconSvg = step.icon && ICONS[step.icon] ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:48px;height:48px; margin-bottom:15px;">${ICONS[step.icon]}</svg>` : (step.icon || '');
+                
+                stepContentHTML += `<div class="lumina-step-content ${isActive}" id="step-${idx}">
+                    ${iconSvg ? `<div style="color:${getThemeStyles(this.options.theme).btn}">${iconSvg}</div>` : ''}
+                    <div>${content}</div>
+                </div>`;
             });
-        },
+            stepContentHTML += `</div>`;
 
-        // Modal personalizado avanzado
-        modal: (content, options = {}) => {
-            return new LuminaAlert({
-                text: content,
-                allowHTML: true, // Los modales personalizados suelen necesitar HTML
-                ...options
-            });
-        },
+            const isLastStep = this.currentStep === this.steps.length - 1;
+            const isFirstStep = this.currentStep === 0;
 
-        // Wizard (Asistente de pasos)
-        wizard: (steps, options = {}) => {
-            return new Promise((resolve, reject) => {
-                let currentStep = 0;
-                const totalSteps = steps.length;
+            const config = {
+                ...this.options,
+                title: currentStepData.title || `Paso ${this.currentStep + 1}`,
+                text: '',
+                html: stepContentHTML,
+                allowHTML: true,
+                showCancelButton: !isFirstStep,
+                confirmButtonText: isLastStep ? this.options.finishButtonText : this.options.confirmButtonText,
+                blocking: currentStepData.blocking || false,
+                closable: currentStepData.closable !== false,
+                onConfirm: () => this.nextStep(),
+                onCancel: () => this.prevStep(),
+                onClose: () => {
+                    if(this.options.onClose) this.options.onClose(this.currentStep);
+                }
+            };
 
-                function showStep(index) {
-                    if (index >= totalSteps) {
-                        resolve({ completed: true, steps: steps });
-                        return;
-                    }
-                    const step = steps[index];
-                    
-                    const alert = new LuminaAlert({
-                        title: step.title || `Paso ${index + 1}`,
-                        text: step.text || step.content || '',
-                        icon: step.icon || 'info',
-                        confirmButtonText: index === totalSteps - 1 ? 'Finalizar' : 'Siguiente',
-                        showCancel: index > 0, // Permitir volver atrás o cancelar si no es el primero
-                        cancelButtonText: index === 0 ? 'Cancelar' : 'Atrás',
-                        allowHTML: true,
-                        blocking: step.blocking || false,
-                        ...options,
-                        onConfirm: (val) => {
-                            if (step.onConfirm) {
-                                const res = step.onConfirm(val);
-                                if (res === false) return false; // Prevenir avance
-                                if (res instanceof Promise) return res;
-                            }
-                            currentStep++;
-                            // Cerrar actual y abrir siguiente
-                            // Truco: la promesa del wizard se resuelve al final
-                            return true; 
-                        },
-                        onCancel: () => {
-                            if (index === 0) reject({ dismissed: true });
-                            else currentStep--;
+            this.instance = new LuminaAlert(config);
+            
+            setTimeout(() => {
+                const dots = document.querySelectorAll('.lumina-step-dot');
+                dots.forEach(dot => {
+                    dot.addEventListener('click', (e) => {
+                        const stepIdx = parseInt(e.target.getAttribute('data-step'));
+                        if(stepIdx < this.currentStep) {
+                            this.jumpToStep(stepIdx);
                         }
                     });
+                });
+            }, 50);
+        }
 
-                    // Hack para manejar el flujo del wizard dentro del ciclo de vida
-                    alert.then((res) => {
-                        if (res === true) showStep(currentStep);
-                    }).catch(() => {
-                         if (currentStep < index) showStep(currentStep); // Si fue "Atrás"
-                         else reject({ dismissed: true }); // Si fue "Cancelar" inicial
-                    });
+        nextStep() {
+            const currentStepData = this.steps[this.currentStep];
+            if (currentStepData.onBeforeNext) {
+                const res = currentStepData.onBeforeNext();
+                if (res === false) return;
+                if (res instanceof Promise) {
+                    return res.then(() => this.proceedNext());
                 }
+            }
+            this.proceedNext();
+        }
 
-                showStep(0);
-            });
-        },
+        proceedNext() {
+            if (this.currentStep < this.steps.length - 1) {
+                this.currentStep++;
+                this.instance.close(true);
+                setTimeout(() => this.init(), 300);
+            } else {
+                this.instance.close(true);
+                if (this.options.onFinish) this.options.onFinish();
+            }
+        }
 
-        // Toast / Notificación flotante
-        toast: (message, type = 'info', options = {}) => {
+        prevStep() {
+            if (this.currentStep > 0) {
+                this.currentStep--;
+                this.instance.close(false);
+                setTimeout(() => this.init(), 300);
+            }
+        }
+
+        jumpToStep(index) {
+            if (index >= 0 && index < this.steps.length) {
+                this.currentStep = index;
+                this.instance.close(true);
+                setTimeout(() => this.init(), 300);
+            }
+        }
+    }
+
+    // --- TOAST ENGINE ---
+    class LuminaToast {
+        constructor(message, options = {}) {
+            this.message = message;
+            this.options = {
+                icon: 'info',
+                theme: 'modern',
+                duration: 3000,
+                position: 'top-right',
+                ...options
+            };
+            this.init();
+        }
+
+        init() {
             injectStyles();
-            const containerId = 'lumina-toast-container-' + (options.position || 'top-right');
-            let container = document.getElementById(containerId);
             
+            let container = document.getElementById('lumina-toast-container');
             if (!container) {
                 container = document.createElement('div');
-                container.id = containerId;
+                container.id = 'lumina-toast-container';
                 container.className = 'lumina-toast-container';
-                
-                // Posicionamiento
-                const pos = options.position || 'top-right';
-                const styles = {
-                    'top-right': { top: '20px', right: '20px', alignItems: 'flex-end' },
-                    'top-left': { top: '20px', left: '20px', alignItems: 'flex-start' },
-                    'bottom-right': { bottom: '20px', right: '20px', alignItems: 'flex-end' },
-                    'bottom-left': { bottom: '20px', left: '20px', alignItems: 'flex-start' },
-                    'top-center': { top: '20px', left: '50%', transform: 'translateX(-50%)', alignItems: 'center' },
-                    'bottom-center': { bottom: '20px', left: '50%', transform: 'translateX(-50%)', alignItems: 'center' }
-                };
-                
-                Object.assign(container.style, styles[pos]);
                 document.body.appendChild(container);
             }
 
+            const pos = this.options.position;
+            container.style.top = pos.includes('top') ? '20px' : 'auto';
+            container.style.bottom = pos.includes('bottom') ? '20px' : 'auto';
+            container.style.left = pos.includes('left') ? '20px' : 'auto';
+            container.style.right = pos.includes('right') ? '20px' : 'auto';
+            if(pos.includes('center')) {
+                container.style.left = '50%';
+                container.style.transform = 'translateX(-50%)';
+            }
+
+            const ts = getThemeStyles(this.options.theme);
+            
             const toast = document.createElement('div');
             toast.className = 'lumina-toast';
+            toast.style.backgroundColor = ts.bg;
+            toast.style.color = ts.text;
+            if(ts.border !== 'transparent') toast.style.border = `1px solid ${ts.border}`;
             
-            const colors = {
-                success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6'
-            };
-            toast.style.borderLeftColor = colors[type] || colors.info;
-            
-            // Icono pequeño
-            const iconPath = icons[type] || icons.info;
+            const iconSvg = ICONS[this.options.icon] || ICONS.info;
             toast.innerHTML = `
-                <div style="color: ${colors[type] || colors.info}">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconPath}</svg>
+                <div class="lumina-toast-icon" style="color: ${ts.btn}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:20px;height:20px">${iconSvg}</svg>
                 </div>
-                <div style="flex:1">${options.allowHTML ? message : escapeHtml(message)}</div>
+                <div class="lumina-toast-msg">${escapeHtml(this.message)}</div>
             `;
-            
+
             container.appendChild(toast);
-            
-            // Animar entrada
-            requestAnimationFrame(() => toast.classList.add('show'));
-            
-            const duration = options.timer || 3000;
-            if (duration > 0) {
+
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            if (this.options.duration > 0) {
                 setTimeout(() => {
                     toast.classList.remove('show');
                     toast.classList.add('hide');
                     setTimeout(() => {
                         if(toast.parentNode) toast.parentNode.removeChild(toast);
-                        if(container.children.length === 0) container.parentNode.removeChild(container);
-                    }, 400);
-                }, duration);
+                    }, 300);
+                }, this.options.duration);
             }
-            
-            return { close: () => toast.click() }; // Simular click para cerrar
+        }
+    }
+
+    // --- API PÚBLICA ---
+    const lumina = {
+        version: VERSION,
+        
+        alert: (text, options = {}) => new LuminaAlert({ text, ...options }),
+        success: (text, options = {}) => new LuminaAlert({ text, icon: 'success', theme: 'success', ...options }),
+        error: (text, options = {}) => new LuminaAlert({ text, icon: 'error', theme: 'error', ...options }),
+        warning: (text, options = {}) => new LuminaAlert({ text, icon: 'warning', theme: 'warning', ...options }),
+        info: (text, options = {}) => new LuminaAlert({ text, icon: 'info', theme: 'info', ...options }),
+        question: (text, options = {}) => new LuminaAlert({ text, icon: 'question', theme: 'question', ...options }),
+        
+        confirm: (text, options = {}) => new LuminaAlert({ text, icon: 'question', showCancelButton: true, ...options }),
+        
+        prompt: (text, options = {}) => new LuminaAlert({ text, input: 'text', showCancelButton: true, ...options }),
+        
+        loading: (text, options = {}) => {
+            const instance = new LuminaAlert({ text, icon: 'loading', allowHTML: true, blocking: true, closable: false, showCloseButton: false, ...options });
+            instance.close = (force) => {
+                if(force) instance.forceClose(true);
+                else instance.handleCancel();
+            };
+            return instance;
         },
 
-        // Loading (Spinner)
-        loading: (title = 'Cargando...', options = {}) => {
-            return new LuminaAlert({
-                title,
-                icon: null, // Sin icono por defecto, o spinner custom
-                allowHTML: true,
-                blocking: true,
-                closable: false,
-                closeOnEsc: false,
-                closeOnOverlay: false,
-                overlayBlur: 8,
-                ...options,
-                // Inyectar spinner CSS si no hay icono
-                onOpen: (instance) => {
-                    if (!options.icon) {
-                        const spinner = `<svg class="animate-spin" style="width:40px;height:40px;color:#6366f1;animation:spin 1s linear infinite" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="4"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-                        const header = instance.elements.modal.querySelector('.lumina-header');
-                        if(header) header.innerHTML = spinner + (title ? `<h2 class="lumina-title" style="margin-top:16px">${title}</h2>` : '');
-                    }
-                    if (options.onOpen) options.onOpen(instance);
-                }
-            });
+        wizard: (steps, options = {}) => new LuminaWizard(steps, options),
+
+        toast: (message, options = {}) => new LuminaToast(message, options),
+
+        modal: (html, options = {}) => new LuminaAlert({ allowHTML: true, html: html, ...options }),
+
+        setDefaults: (newDefaults) => {
+            console.log('Defaults updated', newDefaults);
         },
         
-        // Utilidad para cerrar todas las alertas abiertas
         closeAll: () => {
             document.querySelectorAll('.lumina-overlay').forEach(el => {
                 el.classList.remove('visible');
                 setTimeout(() => el.remove(), 300);
             });
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        },
-
-        // Raw HTML helper (uso bajo responsabilidad del dev)
-        raw: (html) => ({ __html: html })
+        }
     };
-
-    // Agregar estilos de animación extra dinámicamente si es necesario
-    const styleSheet = document.createElement("style");
-    styleSheet.innerText = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
-    document.head.appendChild(styleSheet);
 
     return lumina;
 }));
