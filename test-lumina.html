@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina Alerts v4.0 - Test Suite Completo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .test-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .test-card:hover {
+            transform: translateY(-5px);
+        }
+        .test-card h3 {
+            color: #1f2937;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        .test-card p {
+            color: #6b7280;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .btn-primary { background: #6366f1; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-error { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-info { background: #3b82f6; color: white; }
+        .btn-dark { background: #1f2937; color: white; }
+        
+        .feature-list {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        .feature-list h2 {
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            color: #10b981;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 Lumina Alerts v4.0</h1>
+        <p class="subtitle">Suite de Pruebas - Calidad Profesional</p>
+
+        <!-- Alertas Básicas -->
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>✅ Alertas de Éxito</h3>
+                <p>Alertas positivas con animaciones suaves y tema profesional</p>
+                <div class="btn-group">
+                    <button class="btn-success" onclick="testSuccess()">Success Basic</button>
+                    <button class="btn-success" onclick="testSuccessCustom()">Success Custom</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>❌ Alertas de Error</h3>
+                <p>Notificaciones de error claras y visibles</p>
+                <div class="btn-group">
+                    <button class="btn-error" onclick="testError()">Error Basic</button>
+                    <button class="btn-error" onclick="testErrorBlocking()">Error Blocking</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>⚠️ Advertencias</h3>
+                <p>Alertas de precaución con iconos distintivos</p>
+                <div class="btn-group">
+                    <button class="btn-warning" onclick="testWarning()">Warning</button>
+                    <button class="btn-warning" onclick="testTimer()">Auto-close (3s)</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>ℹ️ Información</h3>
+                <p>Mensajes informativos con diseño limpio</p>
+                <div class="btn-group">
+                    <button class="btn-info" onclick="testInfo()">Info Basic</button>
+                    <button class="btn-info" onclick="testToast()">Toast Notification</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>❓ Confirmaciones</h3>
+                <p>Diálogos de confirmación con promesas</p>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="testConfirm()">Confirm Simple</button>
+                    <button class="btn-primary" onclick="testConfirmPromise()">Confirm Async</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>✏️ Inputs & Prompts</h3>
+                <p>Captura de datos con validación en tiempo real</p>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="testPrompt()">Prompt Text</button>
+                    <button class="btn-primary" onclick="testPassword()">Password Input</button>
+                    <button class="btn-primary" onclick="testEmail()">Email Validation</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>🎨 Temas Personalizados</h3>
+                <p>Múltiples temas visuales profesionales</p>
+                <div class="btn-group">
+                    <button class="btn-dark" onclick="testDark()">Dark Theme</button>
+                    <button class="btn-info" onclick="testGlass()">Glassmorphism</button>
+                    <button class="btn-warning" onclick="testNeon()">Neon Style</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>🔒 Modo Bloqueante</h3>
+                <p>Alertas que requieren acción obligatoria</p>
+                <div class="btn-group">
+                    <button class="btn-error" onclick="testBlocking()">Blocking Alert</button>
+                    <button class="btn-success" onclick="testForceClose()">Force Close</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>🧙 Wizard / Steps</h3>
+                <p>Asistentes multi-paso con navegación</p>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="testWizard()">Start Wizard</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>⏳ Loading States</h3>
+                <p>Indicadores de carga con spinner animado</p>
+                <div class="btn-group">
+                    <button class="btn-info" onclick="testLoading()">Show Loading</button>
+                    <button class="btn-success" onclick="testLoadingAsync()">Async Loading</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>📝 Modals HTML</h3>
+                <p>Modales personalizados con contenido HTML</p>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="testModal()">Custom Modal</button>
+                    <button class="btn-primary" onclick="testRichContent()">Rich Content</button>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>🎭 Animaciones</h3>
+                <p>Diferentes tipos de animaciones de entrada</p>
+                <div class="btn-group">
+                    <button class="btn-info" onclick="testAnim('zoom')">Zoom</button>
+                    <button class="btn-info" onclick="testAnim('slide')">Slide</button>
+                    <button class="btn-info" onclick="testAnim('bounce')">Bounce</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Características -->
+        <div class="feature-list">
+            <h2>🚀 Características Principales</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>✅ Anti-XSS por defecto</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>♿ Accesibilidad WCAG 2.1</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>📱 100% Responsive</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>⚡ Sin dependencias</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>🎯 Focus Trap</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>🔄 Sistema de Colas</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>🎨 12+ Temas Profesionales</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>🔐 Modo Bloqueante</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>📝 Validación de Inputs</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>⏱️ Temporizadores</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>🍞 Toast Notifications</span>
+                </div>
+                <div class="feature-item">
+                    <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>🧙 Wizards Multi-paso</span>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <span class="status-badge">✨ Versión 4.0 - Lista para Producción</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="lumina-alerts.js"></script>
+    <script>
+        // Configurar defaults globales
+        lumina.setDefaults({
+            theme: 'modern',
+            animation: 'zoom'
+        });
+
+        // === TESTS DE ALERTAS BÁSICAS ===
+        function testSuccess() {
+            lumina.success('¡Operación completada exitosamente!', '¡Éxito!');
+        }
+
+        function testSuccessCustom() {
+            lumina.success('Los cambios han sido guardados correctamente.', 'Guardado', {
+                theme: 'success',
+                confirmButtonText: 'Genial',
+                onConfirm: () => console.log('Confirmado custom')
+            });
+        }
+
+        function testError() {
+            lumina.error('Ha ocurrido un error inesperado. Por favor intenta nuevamente.', 'Error Crítico');
+        }
+
+        function testErrorBlocking() {
+            lumina.error('Este es un error bloqueante. Debes tomar una acción.', 'Atención Requerida', {
+                blocking: true,
+                closable: false,
+                closeOnEsc: false,
+                closeOnOverlay: false
+            }).catch(err => console.log('Error dismissed:', err));
+        }
+
+        function testWarning() {
+            lumina.warning('Estás a punto de realizar una acción irreversible.', 'Advertencia', {
+                showCancel: true,
+                confirmButtonText: 'Continuar',
+                cancelButtonText: 'Cancelar'
+            });
+        }
+
+        function testTimer() {
+            lumina.info('Esta alerta se cerrará automáticamente en 3 segundos.', 'Auto-close', {
+                timer: 3000,
+                closable: false
+            });
+        }
+
+        function testInfo() {
+            lumina.info('Nueva actualización disponible. Versión 2.0', 'Información del Sistema');
+        }
+
+        function testToast() {
+            lumina.toast('Mensaje guardado correctamente', 'success', {
+                position: 'top-right',
+                timer: 3000
+            });
+            
+            setTimeout(() => {
+                lumina.toast('Procesando datos...', 'info', {
+                    position: 'top-right',
+                    timer: 2000
+                });
+            }, 500);
+        }
+
+        // === TESTS DE CONFIRMACIÓN ===
+        function testConfirm() {
+            lumina.confirm('¿Estás seguro de que deseas eliminar este elemento?', 'Confirmar Eliminación')
+                .then((result) => {
+                    lumina.success('Elemento eliminado correctamente', 'Eliminado');
+                })
+                .catch((err) => {
+                    lumina.info('Operación cancelada por el usuario', 'Cancelado');
+                });
+        }
+
+        function testConfirmPromise() {
+            lumina.confirm('¿Deseas guardar los cambios antes de salir?', 'Guardar Cambios', {
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Descartar'
+            })
+            .then((result) => {
+                if (result) {
+                    // Simular guardado asíncrono
+                    const loading = lumina.loading('Guardando...');
+                    setTimeout(() => {
+                        loading.close();
+                        lumina.success('Cambios guardados exitosamente', 'Guardado');
+                    }, 1500);
+                } else {
+                    lumina.info('Cambios descartados', 'Info');
+                }
+            })
+            .catch(() => {
+                lumina.info('Operación cancelada', 'Cancelado');
+            });
+        }
+
+        // === TESTS DE INPUTS ===
+        function testPrompt() {
+            lumina.prompt('Ingresa tu nombre de usuario:', 'Registro de Usuario', {
+                placeholder: 'Ej: juanperez',
+                inputValue: '',
+                inputValidator: (value) => {
+                    if (value.length < 3) return 'Mínimo 3 caracteres';
+                    return true;
+                }
+            })
+            .then((result) => {
+                lumina.success(`¡Bienvenido, ${result}!`, 'Usuario Registrado');
+            })
+            .catch(() => {
+                lumina.info('Registro cancelado', 'Cancelado');
+            });
+        }
+
+        function testPassword() {
+            lumina.prompt('Ingresa tu contraseña:', 'Verificación de Seguridad', {
+                inputType: 'password',
+                placeholder: '••••••••',
+                inputValidator: (value) => {
+                    if (value.length < 6) return 'Mínimo 6 caracteres';
+                    return true;
+                }
+            })
+            .then((result) => {
+                lumina.success('Contraseña verificada correctamente', 'Verificado');
+            })
+            .catch(() => {
+                lumina.warning('Verificación cancelada', 'Advertencia');
+            });
+        }
+
+        function testEmail() {
+            lumina.prompt('Ingresa tu correo electrónico:', 'Contacto', {
+                inputType: 'email',
+                placeholder: 'tu@email.com',
+                inputValidator: (value) => {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) return 'Correo inválido';
+                    return true;
+                }
+            })
+            .then((result) => {
+                lumina.success(`Enviaremos información a: ${result}`, 'Email Registrado');
+            })
+            .catch(() => {
+                lumina.info('Operación cancelada', 'Cancelado');
+            });
+        }
+
+        // === TESTS DE TEMAS ===
+        function testDark() {
+            lumina.alert('Este es un tema oscuro profesional ideal para aplicaciones modernas.', 'Dark Theme', {
+                theme: 'dark',
+                icon: 'info'
+            });
+        }
+
+        function testGlass() {
+            lumina.alert('Efecto glassmorphism con transparencia y blur de fondo.', 'Glassmorphism', {
+                theme: 'glass',
+                overlayBlur: 8
+            });
+        }
+
+        function testNeon() {
+            lumina.alert('Estilo neón futurista con efectos de brillo.', 'Neon Style', {
+                theme: 'neon',
+                icon: 'info'
+            });
+        }
+
+        // === TESTS DE BLOQUEO ===
+        function testBlocking() {
+            lumina.question('Debes aceptar los términos para continuar.', 'Términos y Condiciones', {
+                blocking: true,
+                closable: false,
+                closeOnEsc: false,
+                closeOnOverlay: false,
+                confirmButtonText: 'Aceptar',
+                showCancel: true,
+                cancelButtonText: 'Salir'
+            })
+            .then(() => {
+                lumina.success('¡Bienvenido! Has aceptado los términos.', 'Registrado');
+            })
+            .catch(() => {
+                lumina.error('No puedes continuar sin aceptar.', 'Error');
+            });
+        }
+
+        function testForceClose() {
+            const alert = lumina.loading('Procesando... Esto se cerrará automáticamente.', {
+                blocking: true,
+                closable: false
+            });
+            
+            setTimeout(() => {
+                alert.forceClose();
+                lumina.success('Proceso completado forzosamente', 'Completado');
+            }, 2000);
+        }
+
+        // === TEST DE WIZARD ===
+        function testWizard() {
+            lumina.wizard([
+                {
+                    title: 'Paso 1: Información Básica',
+                    text: 'Completa tu perfil con información básica.',
+                    icon: 'info',
+                    onConfirm: (val) => {
+                        console.log('Paso 1 completado');
+                    }
+                },
+                {
+                    title: 'Paso 2: Preferencias',
+                    text: 'Configura tus preferencias personales.',
+                    icon: 'question',
+                    onConfirm: (val) => {
+                        console.log('Paso 2 completado');
+                    }
+                },
+                {
+                    title: 'Paso 3: Confirmación',
+                    text: 'Revisa y confirma toda la información.',
+                    icon: 'success',
+                    onConfirm: (val) => {
+                        console.log('Paso 3 completado');
+                    }
+                }
+            ])
+            .then((result) => {
+                lumina.success('¡Wizard completado exitosamente!', 'Finalizado');
+            })
+            .catch((err) => {
+                lumina.info('Wizard cancelado', 'Cancelado');
+            });
+        }
+
+        // === TESTS DE LOADING ===
+        function testLoading() {
+            const loading = lumina.loading('Cargando recursos...');
+            
+            setTimeout(() => {
+                loading.close();
+                lumina.success('Recursos cargados correctamente', 'Completado');
+            }, 2000);
+        }
+
+        function testLoadingAsync() {
+            lumina.confirm('Iniciar proceso de carga simulado?', 'Simulación')
+            .then(() => {
+                const loading = lumina.loading('Procesando datos...', {
+                    theme: 'modern'
+                });
+                
+                // Simular operación asíncrona
+                setTimeout(() => {
+                    loading.close();
+                    lumina.success('Proceso finalizado', 'Éxito');
+                }, 2500);
+            })
+            .catch(() => {});
+        }
+
+        // === TESTS DE MODALS ===
+        function testModal() {
+            lumina.modal(`
+                <div style="text-align: left;">
+                    <h3 style="margin-bottom: 10px;">Contenido Personalizado</h3>
+                    <p>Puedes incluir cualquier contenido HTML en este modal.</p>
+                    <ul style="margin: 15px 0; padding-left: 20px;">
+                        <li>Elemento 1</li>
+                        <li>Elemento 2</li>
+                        <li>Elemento 3</li>
+                    </ul>
+                    <p>Ideal para formularios complejos o información detallada.</p>
+                </div>
+            `, {
+                title: 'Modal Personalizado',
+                width: '500px',
+                confirmButtonText: 'Entendido',
+                showCancel: true
+            });
+        }
+
+        function testRichContent() {
+            lumina.modal(`
+                <div style="display: flex; align-items: center; gap: 20px; text-align: left;">
+                    <div style="flex: 1;">
+                        <h3 style="color: #6366f1; margin-bottom: 10px;">¡Nueva Funcionalidad!</h3>
+                        <p>Hemos agregado soporte para contenido enriquecido con formato completo.</p>
+                        <p style="font-size: 0.9rem; color: #6b7280;">Disfruta de esta nueva característica en tu aplicación.</p>
+                    </div>
+                    <div style="font-size: 3rem;">🎉</div>
+                </div>
+            `, {
+                theme: 'modern',
+                borderRadius: '20px'
+            });
+        }
+
+        // === TESTS DE ANIMACIONES ===
+        function testAnim(animType) {
+            lumina.info(`Esta alerta usa la animación: <strong>${animType}</strong>`, 'Animación', {
+                animation: animType,
+                allowHTML: true
+            });
+        }
+
+        // Demo inicial al cargar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                lumina.toast('¡Lumina Alerts v4.0 cargado correctamente!', 'success', {
+                    position: 'top-center',
+                    timer: 4000
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

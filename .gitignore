@@ -1,1 +1,1 @@
-lib-ejemplo.js
+Nothing should be ignored based on the provided file changes. The changes consist only of source/config files (.html, .css, .js, .md) and modifications to the existing .gitignore file itself. No build artifacts, dependencies, or temporary files are present in the change list.
